@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
-"POT-Creation-Date: 2026-01-23 21:03+0000\n"
+"POT-Creation-Date: 2026-09-22 09:18+0000\n"
 "PO-Revision-Date: 2026-02-07 22:08+0200\n"
 "Last-Translator: Efstathios Iosifidis <eiosifidis@gmail.com>\n"
 "Language-Team: Greek <Greek>\n"
@@ -28,7 +28,9 @@ msgstr "Πληκτρολογήστε για αναζήτηση"
 
 #: libfoundry-adw/foundry-search-dialog.ui:88
 msgid "Prefix your query with one of the following to filter results"
-msgstr "Προσθέστε ένα από τα παρακάτω προθέματα στο ερώτημά σας για φιλτράρισμα αποτελεσμάτων"
+msgstr ""
+"Προσθέστε ένα από τα παρακάτω προθέματα στο ερώτημά σας για φιλτράρισμα "
+"αποτελεσμάτων"
 
 #: libfoundry-adw/foundry-search-dialog.ui:102
 msgid "Files"
@@ -39,7 +41,7 @@ msgid "Symbols"
 msgstr "Σύμβολα"
 
 #: libfoundry-adw/foundry-search-dialog.ui:144
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:72
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:78
 msgid "Documentation"
 msgstr "Τεκμηρίωση"
 
@@ -63,6 +65,16 @@ msgstr "Εμφάνιση πινάκων"
 msgid "Information"
 msgstr "Πληροφορίες"
 
+#: libfoundry-gtk/markup/foundry-markup-view.c:460
+msgid "Cannot load HTML. Missing WebKit support."
+msgstr "Αδυναμία φόρτωσης HTML. Λείπει η υποστήριξη WebKit."
+
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:96
+msgid "Other"
+msgstr "Άλλο"
+
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:44
 msgid "Keyboard Shortcuts"
 msgstr "Συντομεύσεις πληκτρολογίου"
@@ -79,231 +91,237 @@ msgstr "Τερματικό"
 msgid "Programming Languages"
 msgstr "Γλώσσες προγραμματισμού"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:93
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:568
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:94
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:569
 msgid "Fonts & Styling"
 msgstr "Γραμματοσειρές & Στυλ"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:107
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:574
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:108
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:575
 msgid "Use Custom Font"
 msgstr "Χρήση προσαρμοσμένης γραμματοσειράς"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:118
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:584
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:119
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:585
 msgid "Custom Font"
 msgstr "Προσαρμοσμένη γραμματοσειρά"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:131
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:132
 msgid "Indentation & Formatting"
 msgstr "Εσοχές & Μορφοποίηση"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:140
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:141
 msgid "Formatting"
 msgstr "Μορφοποίηση"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:145
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:146
 msgid "Trailing Newline"
 msgstr "Τελική αλλαγή γραμμής"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:146
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:147
 msgid "Ensure files end with a new line"
 msgstr "Διασφάλιση ότι τα αρχεία τελειώνουν με αλλαγή γραμμής"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:159
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:160
 msgid "Indentation"
 msgstr "Εσοχή"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:164
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:165
 msgid "Auto Indent"
 msgstr "Αυτόματη εσοχή"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:165
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:166
 msgid "Automatically indent while you type"
 msgstr "Αυτόματη εσοχή κατά την πληκτρολόγηση"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:176
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:177
 msgid "Indent Selections on Tab"
 msgstr "Εσοχή επιλογών με το Tab"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:177
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:178
 msgid "Indent selections when tab is pressed"
 msgstr "Εσοχή των επιλογών όταν πατηθεί το πλήκτρο Tab"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:194
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
 msgid "Insert Spaces Instead of Tabs"
 msgstr "Εισαγωγή κενών αντί για στηλοθέτες (Tabs)"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:196
 msgid "Insert spaces instead of tabs when tab is pressed"
-msgstr "Εισαγωγή κενών διαστημάτων αντί για στηλοθέτες όταν πατηθεί το πλήκτρο Tab"
+msgstr ""
+"Εισαγωγή κενών διαστημάτων αντί για στηλοθέτες όταν πατηθεί το πλήκτρο Tab"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:206
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
 msgid "Tab Width"
 msgstr "Πλάτος στηλοθέτη (Tab)"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:208
 msgid "The width of a tab in characters"
 msgstr "Το πλάτος του στηλοθέτη σε χαρακτήρες"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:218
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:219
 msgid "Override Indent Width"
 msgstr "Παράκαμψη πλάτους εσοχής"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:219
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:220
 msgid "Specify an indentation width separate from the tab width"
 msgstr "Καθορισμός πλάτους εσοχής ξεχωριστά από το πλάτος στηλοθέτη"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:230
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:231
 msgid "Indent Width"
 msgstr "Πλάτος εσοχής"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:231
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:232
 msgid "The width to indent in characters"
 msgstr "Το πλάτος της εσοχής σε χαρακτήρες"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:243
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:244
 msgid "Margin"
 msgstr "Περιθώριο"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:249
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:250
 msgid "Show Right Margin"
 msgstr "Εμφάνιση δεξιού περιθωρίου"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:250
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:251
 msgid "Draw an indicator showing the right margin position"
 msgstr "Σχεδίαση δείκτη που δείχνει τη θέση του δεξιού περιθωρίου"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:261
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:262
 msgid "Right Margin Position"
 msgstr "Θέση δεξιού περιθωρίου"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:262
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:263
 msgid "The offset in characters where the right margin should be drawn"
 msgstr "Η μετατόπιση σε χαρακτήρες όπου θα σχεδιαστεί το δεξί περιθώριο"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:274
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:275
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:90
 msgid "Completion"
 msgstr "Συμπλήρωση"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:286
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
 msgid "Complete while Typing"
 msgstr "Συμπλήρωση κατά την πληκτρολόγηση"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:288
 msgid "Automatically complete words and syntax while typing"
 msgstr "Αυτόματη συμπλήρωση λέξεων και σύνταξης κατά την πληκτρολόγηση"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:303
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:304
 msgid "Select First Proposal"
 msgstr "Επιλογή πρώτης πρότασης"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:304
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:305
 msgid "Automatically select the first completion proposal"
 msgstr "Αυτόματη επιλογή της πρώτης πρότασης συμπλήρωσης"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:315
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:316
 msgid "Maximum Completion Proposals"
 msgstr "Μέγιστος αριθμός προτάσεων συμπλήρωσης"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:316
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:317
 msgid "The maximum number of completion rows that will be displayed at once"
 msgstr "Ο μέγιστος αριθμός γραμμών συμπλήρωσης που θα εμφανίζονται ταυτόχρονα"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:328
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:329
 msgid "Smart Keybindings"
 msgstr "Έξυπνοι συνδυασμοί πλήκτρων"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:334
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:335
 msgid "Smart Backspace"
 msgstr "Έξυπνο Backspace"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:335
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:336
 msgid "Remove additional spaces when using backspace to align with tabs"
-msgstr "Αφαίρεση επιπλέον κενών κατά τη χρήση του backspace για στοίχιση με τους στηλοθέτες"
+msgstr ""
+"Αφαίρεση επιπλέον κενών κατά τη χρήση του backspace για στοίχιση με τους "
+"στηλοθέτες"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:346
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:347
 msgid "Smart Home End"
 msgstr "Έξυπνα Home/End"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:347
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:348
 msgid "Move to content instead of line ends when pressing Home/End"
-msgstr "Μετακίνηση στο περιεχόμενο αντί για τα άκρα της γραμμής κατά το πάτημα των Home/End"
+msgstr ""
+"Μετακίνηση στο περιεχόμενο αντί για τα άκρα της γραμμής κατά το πάτημα των "
+"Home/End"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:359
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:360
 msgid "Braces"
 msgstr "Άγκιστρα"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:365
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
 msgid "Insert Matching Brace"
 msgstr "Εισαγωγή ταιριαστού άγκιστρου"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:367
 msgid "Insert matching braces when typing an opening brace"
-msgstr "Εισαγωγή ταιριαστών άγκιστρων κατά την πληκτρολόγηση άγκιστρου ανοίγματος"
+msgstr ""
+"Εισαγωγή ταιριαστών άγκιστρων κατά την πληκτρολόγηση άγκιστρου ανοίγματος"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:377
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
 msgid "Overwrite Matching Brace"
 msgstr "Αντικατάσταση ταιριαστού άγκιστρου"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:379
 msgid "Overwrite matching braces when typing"
 msgstr "Αντικατάσταση ταιριαστών άγκιστρων κατά την πληκτρολόγηση"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:395
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:396
 msgid "Wrap Text"
 msgstr "Αναδίπλωση κειμένου"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:408
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:409
 msgid "Lines"
 msgstr "Γραμμές"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:413
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:414
 msgid "Line Height"
 msgstr "Ύψος γραμμής"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:430
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:431
 msgid "Show Line Numbers"
 msgstr "Εμφάνιση αριθμών γραμμής"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:431
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:432
 msgid "Show line numbers next to each line"
 msgstr "Εμφάνιση αριθμών γραμμής δίπλα σε κάθε γραμμή"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:448
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:449
 msgid "Show Line Changes"
 msgstr "Εμφάνιση αλλαγών γραμμής"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:449
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:450
 msgid "Describe how a line was changed next to each line"
 msgstr "Περιγραφή του πώς άλλαξε μια γραμμή δίπλα σε κάθε γραμμή"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:460
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:461
 msgid "Show Change Overview"
 msgstr "Εμφάνιση επισκόπησης αλλαγών"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:461
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:462
 msgid "Show an overview of changes to the entire document"
 msgstr "Εμφάνιση επισκόπησης των αλλαγών σε ολόκληρο το έγγραφο"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:473
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:474
 msgid "Highlighting"
 msgstr "Επισήμανση"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:479
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:480
 msgid "Highlight Current Line"
 msgstr "Επισήμανση τρέχουσας γραμμής"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:480
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:481
 msgid "Make the current line stand out with highlights"
 msgstr "Εμφατική προβολή της τρέχουσας γραμμής με επισήμανση"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:491
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
 msgid "Highlight Matching Brackets"
 msgstr "Επισήμανση ταιριαστών παρενθέσεων"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:493
 msgid ""
 "Use cursor position to highlight matching brackets, braces, parenthesis, and "
 "more"
@@ -311,91 +329,91 @@ msgstr ""
 "Χρήση θέσης δρομέα για επισήμανση ταιριαστών αγκυλών, άγκιστρων, παρενθέσεων "
 "κ.ά."
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:509
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
 msgid "Highlight Diagnostics"
 msgstr "Επισήμανση διαγνωστικών"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:511
 msgid "Show diagnostics in the text editor"
 msgstr "Εμφάνιση διαγνωστικών στον επεξεργαστή κειμένου"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:522
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:523
 msgid "Behavior"
 msgstr "Συμπεριφορά"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:535
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:536
 msgid "Check Spelling"
 msgstr "Ορθογραφικός έλεγχος"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:536
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:537
 msgid "Automatically check spelling as you type"
 msgstr "Αυτόματος ορθογραφικός έλεγχος κατά την πληκτρολόγηση"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:553
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
 msgid "Use Snippets"
 msgstr "Χρήση αποσπασμάτων κώδικα"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:555
 msgid "Automatically expand snippets when pressing tab"
 msgstr "Αυτόματη ανάπτυξη αποσπασμάτων κατά το πάτημα του tab"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:601
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
 msgid "Allow Bold"
 msgstr "Να επιτρέπεται έντονη γραφή"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:603
 msgid "Allow the use of bold escape sequences"
 msgstr "Να επιτρέπεται η χρήση ακολουθιών διαφυγής για έντονη γραφή"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:612
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
 msgid "Allow Hyperlinks"
 msgstr "Να επιτρέπονται υπερσύνδεσμοι"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:614
 msgid "Allow the use of hyperlinks escape sequences"
 msgstr "Να επιτρέπεται η χρήση ακολουθιών διαφυγής για υπερσυνδέσμους"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:624
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:625
 msgid "Scrolling"
 msgstr "Κύλιση"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:630
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:631
 msgid "Scroll On Output"
 msgstr "Κύλιση κατά την έξοδο"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:631
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:632
 msgid "Automatically scroll when applications within the terminal output text"
 msgstr ""
 "Αυτόματη κύλιση όταν εφαρμογές εντός του τερματικού παράγουν κείμενο εξόδου"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:641
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:642
 msgid "Scroll On Keyboard Input"
 msgstr "Κύλιση κατά την εισαγωγή πληκτρολογίου"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:642
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:643
 msgid "Automatically scroll when typing to insert text"
 msgstr "Αυτόματη κύλιση κατά την πληκτρολόγηση για εισαγωγή κειμένου"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:653
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:654
 msgid "History"
 msgstr "Ιστορικό"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:659
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:660
 msgid "Limit Scrollback"
 msgstr "Όριο αναδρομής κύλισης"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:660
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:661
 msgid ""
 "Limit the number of lines that are stored in memory for terminal scrollback"
 msgstr ""
 "Περιορισμός του αριθμού γραμμών που αποθηκεύονται στη μνήμη για την αναδρομή "
 "κύλισης του τερματικού"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:670
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:671
 msgid "Maximum Lines in Scrollback"
 msgstr "Μέγιστες γραμμές αναδρομής κύλισης"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:671
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:672
 msgid "The maximum number of lines stored in history when limiting scrollback"
 msgstr ""
 "Ο μέγιστος αριθμός γραμμών που αποθηκεύονται στο ιστορικό κατά τον "
@@ -425,46 +443,71 @@ msgstr "Αφαίρεση του %s\n"
 msgid "Build %s"
 msgstr "Δόμηση %s"
 
+#: libfoundry/ci/foundry-ci-provider.c:297
+msgid "Run CI jobs"
+msgstr "Εκτέλεση εργασιών CI"
+
+#: libfoundry/ci/foundry-ci-provider.c:298
+msgid "Run CI pipeline"
+msgstr "Εκτέλεση διοχέτευσης CI"
+
 #: libfoundry/cli/foundry-cli-builtin-build.c:142
 #, c-format
 msgid "Failed to acquire suspend inhibitor: %s\n"
 msgstr "Αποτυχία απόκτησης αναστολέα αναστολής λειτουργίας: %s\n"
 
-#: libfoundry/cli/foundry-cli-builtin-build.c:379
-msgid "Show help"
-msgstr "Εμφάνιση βοήθειας"
-
-#: libfoundry/cli/foundry-cli-builtin-build.c:380
-msgid "Inhibit system suspend while building"
-msgstr "Αποτροπή αναστολής λειτουργίας του συστήματος κατά τη δόμηση"
-
-#: libfoundry/cli/foundry-cli-builtin-build.c:387
+#: libfoundry/cli/foundry-cli-builtin-build.c:355
 msgid "Build the project"
 msgstr "Δόμηση του έργου"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:113
-#: libfoundry/cli/foundry-cli-builtin-init.c:96
-msgid "The directory to initialize, default is current"
-msgstr "Ο κατάλογος προς αρχικοποίηση, προεπιλογή είναι ο τρέχων"
+#: libfoundry/cli/foundry-cli-builtin-build.c:357
+msgid "Build the pipeline"
+msgstr "Δόμηση της διοχέτευσης"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:113
-#: libfoundry/cli/foundry-cli-builtin-init.c:96
-#: libfoundry/cli/foundry-command-line.c:84
-msgid "DIR"
-msgstr "ΚΑΤΑΛΟΓΟΣ"
+#: libfoundry/cli/foundry-cli-builtin-build.c:360
+msgid "Rebuild the project"
+msgstr "Επαναδόμηση του έργου"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:114
-msgid "Specify a branch name to clone"
-msgstr "Καθορισμός ονόματος κλάδου για κλωνοποίηση"
+#: libfoundry/cli/foundry-cli-builtin-build.c:362
+msgid "Rebuild the pipeline"
+msgstr "Επαναδόμηση της διοχέτευσης"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:114
-msgid "Branch"
-msgstr "Κλάδος"
+#: libfoundry/cli/foundry-cli-builtin-build.c:365
+msgid "Clean build outputs"
+msgstr "Εκκαθάριση αποτελεσμάτων δόμησης"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:123
-msgid "URI - Clone a Git repository"
-msgstr "URI - Κλωνοποίηση αποθετηρίου Git"
+#: libfoundry/cli/foundry-cli-builtin-build.c:367
+msgid "Clean pipeline outputs"
+msgstr "Εκκαθάριση αποτελεσμάτων διοχέτευσης"
 
+#: libfoundry/cli/foundry-cli-builtin-build.c:370
+msgid "Purge pipeline state"
+msgstr "Οριστική διαγραφή κατάστασης διοχέτευσης"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:373
+#: libfoundry/cli/foundry-cli-builtin-build.c:375
+msgid "Install the project"
+msgstr "Εγκατάσταση του έργου"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:378
+#: libfoundry/cli/foundry-cli-builtin-build.c:380
+msgid "Export project artifacts"
+msgstr "Εξαγωγή παραγώγων του έργου"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:383
+msgid "Configure the build pipeline"
+msgstr "Ρύθμιση της διοχέτευσης δόμησης"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:392
+#: libfoundry/cli/foundry-cli-command-tree.c:787
+msgid "Show help"
+msgstr "Εμφάνιση βοήθειας"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:393
+msgid "Inhibit system suspend while building"
+msgstr "Αποτροπή αναστολής λειτουργίας του συστήματος κατά τη δόμηση"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:190
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:61
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:66
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:51
@@ -477,11 +520,174 @@ msgstr "URI - Κλωνοποίηση αποθετηρίου Git"
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:49
 #: libfoundry/cli/foundry-cli-builtin-test-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:51
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-vcs-log.c:54
 msgid "ID"
 msgstr "Αναγνωριστικό"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:191
+msgid "Stage"
+msgstr "Στάδιο"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:192
+msgid "Disposition"
+msgstr "Διάθεση"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:193
+msgid "Reason"
+msgstr "Αιτία"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:194
+msgid "Image"
+msgstr "Εικόνα"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:354
+msgid "Bound concurrent jobs"
+msgstr "Περιορισμός ταυτόχρονων εργασιών"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:354
+msgid "N"
+msgstr "N"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:355
+msgid "Use only cached includes"
+msgstr "Χρήση μόνο προσωρινά αποθηκευμένων συμπεριλήψεων"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:356
+msgid "Stop after the first failure"
+msgstr "Διακοπή μετά την πρώτη αποτυχία"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:357
+msgid "Store outputs below DIR"
+msgstr "Αποθήκευση αποτελεσμάτων στον ΚΑΤΑΛΟΓΟ"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:357
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:96
+#: libfoundry/cli/foundry-cli-builtin-private.h:135
+msgid "DIR"
+msgstr "ΚΑΤΑΛΟΓΟΣ"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:358
+msgid "Preserve diagnostic state"
+msgstr "Διατήρηση κατάστασης διαγνωστικών"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:359
+msgid "Preserve job workspaces"
+msgstr "Διατήρηση χώρων εργασίας των εργασιών"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:372
+msgid "Remove cached CI outputs"
+msgstr "Αφαίρεση προσωρινά αποθηκευμένων αποτελεσμάτων CI"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:379
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "Output format (text, json)"
+msgstr "Μορφή εξόδου (text, json)"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:379
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "FORMAT"
+msgstr "ΜΟΡΦΗ"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:384
+msgid "List local CI jobs"
+msgstr "Παράθεση τοπικών εργασιών CI"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:393
+msgid "Run local CI jobs"
+msgstr "Εκτέλεση τοπικών εργασιών CI"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:394
+msgid "[JOB…]"
+msgstr "[ΕΡΓΑΣΙΑ…]"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:402
+msgid "Open a shell for a CI job"
+msgstr "Άνοιγμα κελύφους για μια εργασία CI"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:403
+msgid "JOB"
+msgstr "ΕΡΓΑΣΙΑ"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:96
+msgid "The directory to initialize, default is current"
+msgstr "Ο κατάλογος προς αρχικοποίηση, προεπιλογή είναι ο τρέχων"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:114
+msgid "Specify a branch name to clone"
+msgstr "Καθορισμός ονόματος κλάδου για κλωνοποίηση"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:114
+msgid "Branch"
+msgstr "Κλάδος"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:124
+msgid "Clone a Git repository"
+msgstr "Κλωνοποίηση αποθετηρίου Git"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:125
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
+msgid "URI"
+msgstr "URI"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:62
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:67
@@ -514,87 +720,27 @@ msgstr "Σύστημα δόμησης"
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:60
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:52
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:51
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:52
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51
 msgid "Name"
 msgstr "Όνομα"
 
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
-#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
-#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
-#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
-#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
-#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
-#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
-#: libfoundry/cli/foundry-cli-builtin-grep.c:220
-#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
-#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
-#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
-#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
-#: libfoundry/cli/foundry-cli-builtin-search.c:108
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
-msgid "Output format (text, json)"
-msgstr "Μορφή εξόδου (text, json)"
-
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
-#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
-#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
-#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
-#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
-#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
-#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
-#: libfoundry/cli/foundry-cli-builtin-grep.c:220
-#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
-#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
-#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
-#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
-#: libfoundry/cli/foundry-cli-builtin-search.c:108
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
-msgid "FORMAT"
-msgstr "ΜΟΡΦΗ"
-
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:115
-msgid "List available configs"
-msgstr "Λίστα διαθέσιμων διαμορφώσεων"
+msgid "List available build configurations"
+msgstr "Λίστα διαθέσιμων διαμορφώσεων δόμησης"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:133
 msgid "Set config as default for all project contributors"
 msgstr "Ορισμός διαμόρφωσης ως προεπιλογής για όλους τους συντελεστές του έργου"
 
-#: libfoundry/cli/foundry-cli-builtin-config-switch.c:140
-msgid "CONFIG - Switch current config"
-msgstr "CONFIG - Εναλλαγή τρέχουσας διαμόρφωσης"
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:141
+msgid "Switch the current build configuration"
+msgstr "Εναλλαγή της τρέχουσας διαμόρφωσης δόμησης"
+
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:142
+msgid "CONFIG_ID"
+msgstr "CONFIG_ID"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:86
 msgid "ctags service not available"
@@ -608,9 +754,20 @@ msgstr "δεν υπάρχουν διαθέσιμα δεδομένα ctags"
 msgid "failed to write ctags data"
 msgstr "αποτυχία εγγραφής δεδομένων ctags"
 
-#: libfoundry/cli/foundry-cli-builtin-ctags.c:137
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:138
 msgid "Index a file and output ctags data"
 msgstr "Ευρετηρίαση αρχείου και εξαγωγή δεδομένων ctags"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:139
+#: libfoundry/cli/foundry-cli-builtin-guess-language.c:115
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:118
+#: libfoundry/cli/foundry-cli-builtin-show.c:111
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:191
+#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:167
+#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:113
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:126
+msgid "FILE"
+msgstr ""
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:50
@@ -634,12 +791,18 @@ msgid "Update dependencies"
 msgstr "Ενημέρωση εξαρτήσεων"
 
 #: libfoundry/cli/foundry-cli-builtin-deploy.c:93
-msgid "Deploy the application to active device"
-msgstr "Ανάπτυξη της εφαρμογής στην ενεργή συσκευή"
+msgid "Deploy the application to the active device"
+msgstr "Εγκατάσταση της εφαρμογής στην ενεργή συσκευή"
 
-#: libfoundry/cli/foundry-cli-builtin-devenv.c:130
-msgid "[-- COMMAND] - Start shell in build environment"
-msgstr "[-- ΕΝΤΟΛΗ] - Εκκίνηση κελύφους σε περιβάλλον δόμησης"
+#: libfoundry/cli/foundry-cli-builtin-devenv.c:131
+#: libfoundry/cli/foundry-cli-builtin-shell.c:157
+msgid "Start a shell in the build environment"
+msgstr "Εκκίνηση κελύφους στο περιβάλλον δόμησης"
+
+#: libfoundry/cli/foundry-cli-builtin-devenv.c:132
+#: libfoundry/cli/foundry-cli-builtin-run.c:138
+msgid "[-- COMMAND…]"
+msgstr "[-- COMMAND…]"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:69
 msgid "Chassis"
@@ -652,7 +815,6 @@ msgid "System"
 msgstr "Σύστημα"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:140
-#: libfoundry/cli/foundry-command-line.c:283
 msgid "List available devices"
 msgstr "Λίστα διαθέσιμων συσκευών"
 
@@ -660,9 +822,13 @@ msgstr "Λίστα διαθέσιμων συσκευών"
 msgid "Set device as default for all project contributors"
 msgstr "Ορισμός συσκευής ως προεπιλογής για όλους τους συντελεστές του έργου"
 
-#: libfoundry/cli/foundry-cli-builtin-device-switch.c:140
-msgid "DEVICE - Switch current device"
-msgstr "DEVICE - Εναλλαγή τρέχουσας συσκευής"
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:141
+msgid "Switch the current device"
+msgstr "Εναλλαγή της τρέχουσας συσκευής"
+
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:142
+msgid "DEVICE_ID"
+msgstr "DEVICE_ID"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:63
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:51
@@ -690,9 +856,13 @@ msgstr "Κανόνας"
 msgid "Message"
 msgstr "Μήνυμα"
 
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:138
-msgid "FILE [FILE...] - Diagnose a file"
-msgstr "ΑΡΧΕΙΟ [ΑΡΧΕΙΟ...] - Διάγνωση αρχείου"
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:139
+msgid "Diagnose files"
+msgstr "Διάγνωση αρχείων"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:140
+msgid "FILE…"
+msgstr "FILE…"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-install.c:154
 msgid "Installing Documentation"
@@ -773,8 +943,10 @@ msgstr "Ερώτημα στην τεκμηρίωση"
 #: libfoundry/cli/foundry-cli-builtin-enter.c:113
 #: libfoundry/cli/foundry-cli-builtin-init.c:66
 #: libfoundry/cli/foundry-cli-builtin-init.c:80
-#: libfoundry/cli/foundry-command-line.c:110
-#: libfoundry/cli/foundry-command-line.c:135
+#: libfoundry/cli/foundry-command-line.c:158
+#: libfoundry/cli/foundry-command-line.c:194
+#: libfoundry/cli/foundry-command-line.c:207
+#: libfoundry/cli/foundry-command-line.c:304
 msgid "error"
 msgstr "σφάλμα"
 
@@ -798,9 +970,13 @@ msgstr "Εκκίνηση κελύφους εντός ενός έργου foundry
 msgid "Print parent symbols as a tree"
 msgstr "Εκτύπωση γονικών συμβόλων ως δέντρο"
 
-#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:167
-msgid "Find symbol at a specific position in a file"
-msgstr "Εύρεση συμβόλου σε συγκεκριμένη θέση σε ένα αρχείο"
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:168
+msgid "Find a symbol at a position in a file"
+msgstr "Εύρεση συμβόλου σε μια θέση σε ένα αρχείο"
+
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:169
+msgid "FILE LINE LINE_OFFSET"
+msgstr "FILE LINE LINE_OFFSET"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:56
@@ -831,12 +1007,12 @@ msgid "KEYWORDS"
 msgstr "ΛΕΞΕΙΣ-ΚΛΕΙΔΙΑ"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:134
-msgid "List issues found on forge"
-msgstr "Λίστα ζητημάτων που βρέθηκαν στο σιδηρουργείο"
+msgid "List issues from the current forge"
+msgstr "Λίστα ζητημάτων από το τρέχον forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-list.c:88
 msgid "List available forges"
-msgstr "Λίστα διαθέσιμων σιδηρουργείων"
+msgstr "Λίστα διαθέσιμων forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:129
 msgid "List only closed merge requests"
@@ -851,8 +1027,8 @@ msgid "List only merged merge requests"
 msgstr "Λίστα μόνο των συγχωνευμένων αιτημάτων συγχώνευσης"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:139
-msgid "List merge requests found on forge"
-msgstr "Λίστα αιτημάτων συγχώνευσης που βρέθηκαν στο σιδηρουργείο"
+msgid "List merge requests from the current forge"
+msgstr "Λίστα αιτημάτων συγχώνευσης από το τρέχον forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:50
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:53
@@ -869,24 +1045,28 @@ msgid "Avatar URL"
 msgstr "URL εικονιδίου χρήστη"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:104
-msgid "Get info on current forge project"
-msgstr "Λήψη πληροφοριών για το τρέχον έργο σιδηρουργείου"
+msgid "Show the current forge project"
+msgstr "Εμφάνιση του τρέχοντος έργου forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:106
 msgid "Clear the forge setting"
-msgstr "Εκκαθάριση της ρύθμισης σιδηρουργείου"
+msgstr "Εκκαθάριση της ρύθμισης forge"
 
-#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:113
-msgid "FORGE - Switch forge to FORGE"
-msgstr "ΣΙΔΗΡΟΥΡΓΕΙΟ - Αλλαγή σιδηρουργείου σε ΣΙΔΗΡΟΥΡΓΕΙΟ"
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:114
+msgid "Switch the current forge"
+msgstr "Εναλλαγή του τρέχοντος forge"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:115
+msgid "[FORGE]"
+msgstr "[FORGE]"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:54
 msgid "Bio"
 msgstr "Βιογραφικό"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:107
-msgid "Get info on current forge user"
-msgstr "Λήψη πληροφοριών για τον τρέχοντα χρήστη σιδηρουργείου"
+msgid "Show the current forge user"
+msgstr "Εμφάνιση του τρέχοντος χρήστη forge"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:64
 msgid "Uri"
@@ -965,13 +1145,17 @@ msgstr "Αντικατάσταση αντιστοιχιών με το δοθέν
 msgid "TEXT"
 msgstr "ΚΕΙΜΕΝΟ"
 
-#: libfoundry/cli/foundry-cli-builtin-grep.c:236
+#: libfoundry/cli/foundry-cli-builtin-grep.c:237
 msgid "Search for text patterns in files"
 msgstr "Αναζήτηση για μοτίβα κειμένου σε αρχεία"
 
-#: libfoundry/cli/foundry-cli-builtin-guess-language.c:113
-msgid "FILE - Guess a files language"
-msgstr "ΑΡΧΕΙΟ - Πρόβλεψη γλώσσας αρχείου"
+#: libfoundry/cli/foundry-cli-builtin-grep.c:238
+msgid "PATTERN [TARGET…]"
+msgstr "ΜΟΤΙΒΟ [ΠΡΟΟΡΙΣΜΟΣ…]"
+
+#: libfoundry/cli/foundry-cli-builtin-guess-language.c:114
+msgid "Guess a file's language"
+msgstr "Εικασία γλώσσας ενός αρχείου"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:54
 #, c-format
@@ -995,9 +1179,13 @@ msgstr "Αποτυχία τερματισμού του foundry"
 msgid "Initialize a foundry project"
 msgstr "Αρχικοποίηση έργου foundry"
 
-#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:118
-msgid "MODEL - Complete using a LLM"
-msgstr "ΜΟΝΤΕΛΟ - Συμπλήρωση με χρήση LLM"
+#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:119
+msgid "Complete a prompt using a language model"
+msgstr "Συμπλήρωση προτροπής με χρήση γλωσσικού μοντέλου"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:120
+msgid "MODEL PROMPT"
+msgstr "MODEL PROMPT"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:50
 msgid "Digest"
@@ -1006,10 +1194,6 @@ msgstr "Σύνοψη"
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:94
 msgid "List available language models"
 msgstr "Λίστα διαθέσιμων γλωσσικών μοντέλων"
-
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
-msgid "URI"
-msgstr "URI"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:53
 msgid "Content Type"
@@ -1028,16 +1212,24 @@ msgid "Languages"
 msgstr "Γλώσσες"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:91
-msgid "List available lsps"
-msgstr "Λίστα διαθέσιμων lsp"
+msgid "List available language servers"
+msgstr "Λίστα διαθέσιμων διακομιστών γλώσσας"
 
-#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:131
+#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:132
+msgid "Prefer a language server plugin"
+msgstr "Προτίμηση ενός πρόσθετου διακομιστή γλώσσας"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:133
 msgid "PLUGIN LANGUAGE"
-msgstr "ΓΛΩΣΣΑ ΠΡΟΣΘΕΤΟΥ"
+msgstr "ΠΡΟΣΘΕΤΟ ΓΛΩΣΣΑ"
 
-#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:195
-msgid "LANGUAGE - Run a language server"
-msgstr "ΓΛΩΣΣΑ - Εκτέλεση εξυπηρετητή γλώσσας"
+#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:196
+msgid "Run a language server"
+msgstr "Εκτέλεση ενός διακομιστή γλώσσας"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:197
+msgid "LANGUAGE"
+msgstr "ΓΛΩΣΣΑ"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:61
 msgid "Failed to get stdin/stdout file descriptors"
@@ -1051,9 +1243,13 @@ msgstr "Αποτυχία δημιουργίας εξυπηρετητή MCP"
 msgid "Run MCP server"
 msgstr "Εκτέλεση εξυπηρετητή MCP"
 
-#: libfoundry/cli/foundry-cli-builtin-mdoc.c:112
-msgid "KEYWORD - find gir doc in markdown"
-msgstr "ΛΕΞΗ-ΚΛΕΙΔΙ - εύρεση τεκμηρίωσης gir σε markdown"
+#: libfoundry/cli/foundry-cli-builtin-mdoc.c:113
+msgid "Find GIR documentation in Markdown"
+msgstr "Εύρεση τεκμηρίωσης GIR σε Markdown"
+
+#: libfoundry/cli/foundry-cli-builtin-mdoc.c:114
+msgid "KEYWORD"
+msgstr "ΛΕΞΗ-ΚΛΕΙΔΙ"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:62
 msgid "Directory"
@@ -1063,16 +1259,9 @@ msgstr "Κατάλογος"
 msgid "Flags"
 msgstr "Σημαίες"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:116
-msgid "FILE - List command to compile file"
-msgstr "ΑΡΧΕΙΟ - Λίστα εντολών για μεταγλώττιση αρχείου"
-
-#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:218
-msgid ""
-"PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build pipeline"
-msgstr ""
-"ΦΑΣΗ ΚΑΤΑΛΟΓΟΣ_ΕΡΓΟΥ ΣΥΝΔΕΔΕΜΕΝΗ_ΦΑΣΗ - Σύνδεση χώρου εργασίας στη διοχέτευση "
-"δόμησης"
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:117
+msgid "Show the command used to compile a file"
+msgstr "Εμφάνιση της εντολής που χρησιμοποιήθηκε για τη μεταγλώττιση ενός αρχείου"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:48
 msgid "Phase"
@@ -1083,42 +1272,146 @@ msgid "Completed"
 msgstr "Ολοκληρώθηκε"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:93
-msgid "List information about pipeline"
-msgstr "Λίστα πληροφοριών σχετικά με τη διοχέτευση"
+msgid "Show information about the build pipeline"
+msgstr "Εμφάνιση πληροφοριών σχετικά με τη διοχέτευση δόμησης"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-invalidate.c:73
 msgid "Invalidate the build pipeline"
 msgstr "Ακύρωση της διοχέτευσης δόμησης"
 
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:219
+msgid "Link a workspace to the build pipeline"
+msgstr "Σύνδεση χώρου εργασίας στη διοχέτευση δόμησης"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:220
+msgid "PHASE PROJECT_DIRECTORY LINKED_PHASE"
+msgstr "ΦΑΣΗ ΚΑΤΑΛΟΓΟΣ_ΕΡΓΟΥ ΣΥΝΔΕΔΕΜΕΝΗ_ΦΑΣΗ"
+
 #: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:97
 msgid "List known build targets"
 msgstr "Λίστα γνωστών στόχων δόμησης"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:241
-msgid "PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"
-msgstr ""
-"ΦΑΣΗ ΚΑΤΑΛΟΓΟΣ_ΕΡΓΟΥ - Αποσύνδεση ενός χώρου εργασίας από τη διοχέτευση "
-"δόμησης"
+#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:242
+msgid "Unlink a workspace from the build pipeline"
+msgstr "Αποσύνδεση χώρου εργασίας από τη διοχέτευση δόμησης"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:96
-msgid "PROGRAM - Look for PROGRAM in build pipeline"
-msgstr "ΠΡΟΓΡΑΜΜΑ - Αναζήτηση για ΠΡΟΓΡΑΜΜΑ στη διοχέτευση δόμησης"
+#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:243
+msgid "PHASE PROJECT_DIRECTORY"
+msgstr "ΦΑΣΗ ΚΑΤΑΛΟΓΟΣ_ΕΡΓΟΥ"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:97
+msgid "Find a program in the build pipeline"
+msgstr "Εύρεση προγράμματος στη διοχέτευση δόμησης"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:98
+msgid "PROGRAM"
+msgstr "ΠΡΟΓΡΑΜΜΑ"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:135
+msgid "Set the path to the .foundry dir"
+msgstr "Ορισμός διαδρομής για τον κατάλογο .foundry"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:137
+msgid "Use the shared user context"
+msgstr "Χρήση του κοινόχρηστου περιβάλλοντος χρήστη"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:139
+msgid "Show version information"
+msgstr "Εμφάνιση πληροφοριών έκδοσης"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:243
+msgid "Inspect and manage the build pipeline"
+msgstr "Επιθεώρηση και διαχείριση της διοχέτευσης δόμησης"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:247
+msgid "List and run continuous integration jobs"
+msgstr "Λίστα και εκτέλεση εργασιών συνεχούς ενσωμάτωσης"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:251
+msgid "List and select build configurations"
+msgstr "Λίστα και επιλογή διαμορφώσεων δόμησης"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:255
+msgid "List and update project dependencies"
+msgstr "Λίστα και ενημέρωση εξαρτήσεων έργου"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:259
+msgid "List and select target devices"
+msgstr "Λίστα και επιλογή συσκευών προορισμού"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:263
+msgid "List, install, and inspect SDKs"
+msgstr "Λίστα, εγκατάσταση και επιθεώρηση SDK"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:267
+msgid "Manage stored service credentials"
+msgstr "Διαχείριση αποθηκευμένων διαπιστευτηρίων υπηρεσίας"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:271
+msgid "Read and update Foundry settings"
+msgstr "Ανάγνωση και ενημέρωση ρυθμίσεων Foundry"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:275
+msgid "List and run project tests"
+msgstr "Λίστα και εκτέλεση δοκιμών έργου"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:280
+msgid "Search and manage documentation"
+msgstr "Αναζήτηση και διαχείριση τεκμηρίωσης"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:284
+msgid "List and install documentation bundles"
+msgstr "Λίστα και εγκατάσταση δεσμών τεκμηρίωσης"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:290
+msgid "Inspect and configure forge integrations"
+msgstr "Επιθεώρηση και διαμόρφωση ενσωματώσεων forge"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:294
+msgid "Inspect forge issues"
+msgstr "Επιθεώρηση ζητημάτων forge"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:298
+msgid "Inspect forge merge requests"
+msgstr "Επιθεώρηση αιτημάτων συγχώνευσης forge"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:304
+msgid "Inspect and use language models"
+msgstr "Επιθεώρηση και χρήση γλωσσικών μοντέλων"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:310
+msgid "List, configure, and run language servers"
+msgstr "Λίστα, διαμόρφωση και εκτέλεση διακομιστών γλώσσας"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:316
+msgid "List and expand project templates"
+msgstr "Λίστα και ανάπτυξη προτύπων έργου"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:322
+msgid "Inspect and configure version control"
+msgstr "Επιθεώρηση και διαμόρφωση ελέγχου εκδόσεων"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:89
 msgid "No default run command specified in configuration"
 msgstr "Δεν έχει καθοριστεί προεπιλεγμένη εντολή εκτέλεσης στη διαμόρφωση"
 
-#: libfoundry/cli/foundry-cli-builtin-run.c:136
-msgid "[-- COMMAND...] - Run the application"
-msgstr "[-- ΕΝΤΟΛΗ...] - Εκτέλεση της εφαρμογής"
+#: libfoundry/cli/foundry-cli-builtin-run.c:137
+msgid "Run the application"
+msgstr "Εκτέλεση της εφαρμογής"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:113
 msgid "Installing SDK"
 msgstr "Εγκατάσταση SDK"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:154
-msgid "SDK_ID - Install a SDK"
-msgstr "ΑΝΑΓΝΩΡΙΣΤΙΚΟ_SDK - Εγκατάσταση ενός SDK"
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:155
+msgid "Install an SDK"
+msgstr "Εγκατάσταση ενός SDK"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:156
+#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:176
+#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:135
+msgid "SDK_ID"
+msgstr "ΑΝΑΓΝΩΡΙΣΤΙΚΟ_SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:61
 msgid "Arch"
@@ -1129,71 +1422,84 @@ msgid "Extension"
 msgstr "Επέκταση"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:114
-#: libfoundry/cli/foundry-command-line.c:269
 msgid "List available SDKs"
 msgstr "Λίστα διαθέσιμων SDK"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:174
-msgid "SDK - Start a shell in SDK"
-msgstr "SDK - Εκκίνηση κελύφους στο SDK"
+#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:175
+msgid "Start a shell in an SDK"
+msgstr "Εκκίνηση κελύφους σε ένα SDK"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:133
-msgid "SDK_ID - Switch current SDK"
-msgstr "ΑΝΑΓΝΩΡΙΣΤΙΚΟ_SDK - Αλλαγή τρέχοντος SDK"
+#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:134
+msgid "Switch the current SDK"
+msgstr "Εναλλαγή του τρέχοντος SDK"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:143
-msgid "SDK PROGRAM - Look for PROGRAM in SDK"
-msgstr "SDK ΠΡΟΓΡΑΜΜΑ - Αναζήτηση για ΠΡΟΓΡΑΜΜΑ στο SDK"
+#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:144
+msgid "Find a program in an SDK"
+msgstr "Εύρεση προγράμματος σε ένα SDK"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:145
+msgid "SDK_ID PROGRAM"
+msgstr "ΑΝΑΓΝΩΡΙΣΤΙΚΟ_SDK ΠΡΟΓΡΑΜΜΑ"
 
 #: libfoundry/cli/foundry-cli-builtin-search.c:115
 msgid "Query search providers"
 msgstr "Ερώτημα σε παρόχους αναζήτησης"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:120
-msgid "HOSTNAME SERVICE - Check when API key expires"
-msgstr "ΟΝΟΜΑ_ΥΠΟΛΟΓΙΣΤΗ ΥΠΗΡΕΣΙΑ - Έλεγχος λήξης κλειδιού API"
+#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:121
+msgid "Show when an API key expires"
+msgstr "Εμφάνιση της ημερομηνίας λήξης ενός κλειδιού API"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:142
-msgid "HOSTNAME SERVICE - Retrieve API key for service"
-msgstr "ΟΝΟΜΑ_ΥΠΟΛΟΓΙΣΤΗ ΥΠΗΡΕΣΙΑ - Ανάκτηση κλειδιού API για την υπηρεσία"
+#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:122
+#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:146
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:153
+msgid "HOSTNAME SERVICE"
+msgstr "ΟΝΟΜΑ_ΥΠΟΛΟΓΙΣΤΗ ΥΠΗΡΕΣΙΑ"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:145
+msgid "Retrieve an API key for a service"
+msgstr "Ανάκτηση κλειδιού API για μια υπηρεσία"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:143
 msgid "Set expiration date in YYYY-MM-DD format"
 msgstr "Ορισμός ημερομηνίας λήξης σε μορφή ΕΕΕΕ-ΜΜ-ΗΗ"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:143
 msgid "DATE"
 msgstr "ΗΜΕΡΟΜΗΝΙΑ"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:149
-msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
-msgstr ""
-"[ΕΠΙΛΟΓΕΣ] ΟΝΟΜΑ_ΥΠΟΛΟΓΙΣΤΗ ΥΠΗΡΕΣΙΑ - Περιοδική εναλλαγή κλειδιού API για "
-"την υπηρεσία"
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:152
+msgid "Rotate an API key for a service"
+msgstr "Περιοδική εναλλαγή κλειδιού API για μια υπηρεσία"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:143
-msgid "HOSTNAME SERVICE API_KEY - Store API key for service"
-msgstr ""
-"ΟΝΟΜΑ_ΥΠΟΛΟΓΙΣΤΗ ΥΠΗΡΕΣΙΑ ΚΛΕΙΔΙ_API - Αποθήκευση κλειδιού API για την "
-"υπηρεσία"
+#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:179
+msgid "Store an API key for a service"
+msgstr "Αποθήκευση κλειδιού API για μια υπηρεσία"
 
-#: libfoundry/cli/foundry-cli-builtin-settings-get.c:241
-msgid "SCHEMA KEY - Get setting"
-msgstr "ΣΧΗΜΑ ΚΛΕΙΔΙ - Λήψη ρύθμισης"
+#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:180
+msgid "HOSTNAME SERVICE [API_KEY]"
+msgstr "ΟΝΟΜΑ_ΥΠΟΛΟΓΙΣΤΗ ΥΠΗΡΕΣΙΑ [ΚΛΕΙΔΙ_API]"
 
-#: libfoundry/cli/foundry-cli-builtin-settings-set.c:282
-msgid "SCHEMA KEY - Set setting"
-msgstr "ΣΧΗΜΑ ΚΛΕΙΔΙ - Ορισμός ρύθμισης"
+#: libfoundry/cli/foundry-cli-builtin-settings-get.c:242
+msgid "Get a setting"
+msgstr "Λήψη ρύθμισης"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-get.c:243
+msgid "SCHEMA KEY"
+msgstr "ΣΧΗΜΑ ΚΛΕΙΔΙ"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-set.c:283
+msgid "Set a setting"
+msgstr "Ορισμός ρύθμισης"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-set.c:284
+msgid "SCHEMA KEY VALUE"
+msgstr "ΣΧΗΜΑ ΚΛΕΙΔΙ ΤΙΜΗ"
 
 #: libfoundry/cli/foundry-cli-builtin-shell.c:150
 msgid "Enter environment for running applications"
 msgstr "Είσοδος στο περιβάλλον για εκτέλεση εφαρμογών"
 
-#: libfoundry/cli/foundry-cli-builtin-shell.c:157
-msgid "- Start shell in build environment"
-msgstr "- Εκκίνηση κελύφους σε περιβάλλον δόμησης"
-
-#: libfoundry/cli/foundry-cli-builtin-show.c:109
+#: libfoundry/cli/foundry-cli-builtin-show.c:110
 msgid "Reveal a file in the file manager"
 msgstr "Εμφάνιση αρχείου στον διαχειριστή αρχείων"
 
@@ -1205,13 +1511,17 @@ msgstr "Δεν βρέθηκαν σύμβολα"
 msgid "Print object type names next to symbol names"
 msgstr "Εκτύπωση ονομάτων τύπου αντικειμένου δίπλα στα ονόματα συμβόλων"
 
-#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:189
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:190
 msgid "List symbols in a file as a tree"
 msgstr "Λίστα συμβόλων σε αρχείο ως δέντρο"
 
-#: libfoundry/cli/foundry-cli-builtin-template-create.c:160
-msgid "TEMPLATE_ID|TEMPLATE_FILE - Expand a template"
-msgstr "ΑΝΑΓΝΩΡΙΣΤΙΚΟ_ΠΡΟΤΥΠΟΥ|ΑΡΧΕΙΟ_ΠΡΟΤΥΠΟΥ - Ανάπτυξη προτύπου"
+#: libfoundry/cli/foundry-cli-builtin-template-create.c:161
+msgid "Expand a project template"
+msgstr "Ανάπτυξη ενός προτύπου έργου"
+
+#: libfoundry/cli/foundry-cli-builtin-template-create.c:162
+msgid "TEMPLATE_ID|TEMPLATE_FILE"
+msgstr "ΑΝΑΓΝΩΡΙΣΤΙΚΟ_ΠΡΟΤΥΠΟΥ|ΑΡΧΕΙΟ_ΠΡΟΤΥΠΟΥ"
 
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:51
 msgid "Tags"
@@ -1229,21 +1539,29 @@ msgstr "Συλλογές"
 msgid "List available tests"
 msgstr "Λίστα διαθέσιμων δοκιμών"
 
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:127
-msgid "TEST - Run a test"
-msgstr "ΔΟΚΙΜΗ - Εκτέλεση μιας δοκιμής"
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:128
+msgid "Run a project test"
+msgstr "Εκτέλεση δοκιμής έργου"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:165
-msgid "FILE - Print commit blame information"
-msgstr "ΑΡΧΕΙΟ - Εκτύπωση πληροφοριών χρέωσης (blame) της υποβολής"
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:129
+msgid "TEST_NAME"
+msgstr "ΟΝΟΜΑ_ΔΟΚΙΜΗΣ"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:153
-msgid "FILE - Print commit fetch information"
-msgstr "ΑΡΧΕΙΟ - Εκτύπωση πληροφοριών ανάκτησης υποβολής"
+#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:166
+msgid "Show commit attribution for a file"
+msgstr "Εμφάνιση απόδοσης υποβολών για ένα αρχείο"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:111
-msgid "FILE - Check if FILE is ignored"
-msgstr "ΑΡΧΕΙΟ - Έλεγχος αν το ΑΡΧΕΙΟ αγνοείται"
+#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:154
+msgid "Fetch changes from a remote"
+msgstr "Ανάκτηση αλλαγών από απομακρυσμένη τοποθεσία"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:155
+msgid "REMOTE"
+msgstr "ΑΠΟΜΑΚΡΥΣΜΕΝΗ_ΤΟΠΟΘΕΣΙΑ"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:112
+msgid "Check whether a file is ignored"
+msgstr "Έλεγχος αν ένα αρχείο αγνοείται"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:53
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:53
@@ -1251,10 +1569,20 @@ msgid "Local"
 msgstr "Τοπικά"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:101
+msgid "List branches known to the VCS"
+msgstr "Λίστα κλάδων γνωστών στο VCS"
+
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
 msgid "List files known to the VCS"
 msgstr "Λίστα αρχείων γνωστών στο VCS"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
+msgid "List remotes known to the VCS"
+msgstr "Λίστα απομακρυσμένων τοποθεσιών γνωστών στο VCS"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
+msgid "List tags known to the VCS"
+msgstr "Λίστα ετικετών γνωστών στο VCS"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
 msgid "Branch Name"
@@ -1264,218 +1592,69 @@ msgstr "Όνομα κλάδου"
 msgid "List available version control systems"
 msgstr "Λίστα διαθέσιμων συστημάτων ελέγχου εκδόσεων"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
-msgid "List remotes known to the VCS"
-msgstr "Λίστα απομακρυσμένων τοποθεσιών γνωστών στο VCS"
-
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:124
-msgid "Get history for a file"
-msgstr "Λήψη ιστορικού για ένα αρχείο"
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:125
+msgid "Show history for a file"
+msgstr "Εμφάνιση ιστορικού για ένα αρχείο"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:133
 msgid "Set VCS as default for all project contributors"
 msgstr "Ορισμός VCS ως προεπιλογής για όλους τους συντελεστές του έργου"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:140
-msgid "VCS - Switch current version control system"
-msgstr "VCS - Αλλαγή τρέχοντος συστήματος ελέγχου εκδόσεων"
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:141
+msgid "Switch the current version control system"
+msgstr "Εναλλαγή του τρέχοντος συστήματος ελέγχου εκδόσεων"
 
-#: libfoundry/cli/foundry-cli-command.c:558
-msgid "Usage"
-msgstr "Χρήση"
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:142
+msgid "VCS_ID"
+msgstr "ΑΝΑΓΝΩΡΙΣΤΙΚΟ_VCS"
 
-#: libfoundry/cli/foundry-cli-command.c:558
-msgid "OPTIONS"
-msgstr "ΕΠΙΛΟΓΕΣ"
+#: libfoundry/cli/foundry-cli-command-tree.c:740
+msgid "VALUE"
+msgstr "ΤΙΜΗ"
 
-#: libfoundry/cli/foundry-cli-command-tree.c:590
+#: libfoundry/cli/foundry-cli-command-tree.c:782
+msgid "Options"
+msgstr "Επιλογές"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:835
+msgid "Commands"
+msgstr "Εντολές"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:889
+#: libfoundry/cli/foundry-cli-command-tree.c:992
 #, c-format
 msgid "No such command"
 msgstr "Δεν υπάρχει τέτοια εντολή"
 
-#: libfoundry/cli/foundry-command-line.c:84
-msgid "Set the path to the .foundry dir"
-msgstr "Ορισμός διαδρομής για τον κατάλογο .foundry"
+#: libfoundry/cli/foundry-cli-command-tree.c:903
+#, c-format
+msgid "Unknown option %s for “%s”"
+msgstr "Άγνωστη επιλογή %s για το «%s»"
 
-#: libfoundry/cli/foundry-command-line.c:219
-msgid "Usage:"
-msgstr "Χρήση:"
+#: libfoundry/cli/foundry-cli-command-tree.c:910
+#, c-format
+msgid "Unknown command “%s” for “%s”"
+msgstr "Άγνωστη εντολή «%s» για το «%s»"
 
-#: libfoundry/cli/foundry-command-line.c:222
-msgid "Commands"
-msgstr "Εντολές"
+#: libfoundry/cli/foundry-cli-command-tree.c:918
+#: libfoundry/cli/foundry-cli-command.c:588
+msgid "Usage"
+msgstr "Χρήση"
 
-#: libfoundry/cli/foundry-command-line.c:223
-msgid "Initialize a new project in current directory"
-msgstr "Αρχικοποίηση νέου έργου στον τρέχοντα κατάλογο"
+#: libfoundry/cli/foundry-cli-command-tree.c:921
+#: libfoundry/cli/foundry-cli-command.c:588
+msgid "OPTIONS"
+msgstr "ΕΠΙΛΟΓΕΣ"
 
-#: libfoundry/cli/foundry-command-line.c:226
-msgid "Environment Commands"
-msgstr "Εντολές περιβάλλοντος"
+#: libfoundry/cli/foundry-cli-command-tree.c:924
+msgid "COMMAND"
+msgstr "ΕΝΤΟΛΗ"
 
-#: libfoundry/cli/foundry-command-line.c:227
-msgid "Enter environment of project in current directory"
-msgstr "Είσοδος στο περιβάλλον του έργου στον τρέχοντα κατάλογο"
-
-#: libfoundry/cli/foundry-command-line.c:228
-msgid "Enter build environment for project"
-msgstr "Είσοδος στο περιβάλλον δόμησης για το έργο"
-
-#: libfoundry/cli/foundry-command-line.c:230
-msgid "Build Commands"
-msgstr "Εντολές δόμησης"
-
-#: libfoundry/cli/foundry-command-line.c:231
-msgid "Build the current build pipeline"
-msgstr "Δόμηση της τρέχουσας διοχέτευσης δόμησης"
-
-#: libfoundry/cli/foundry-command-line.c:232
-msgid "Wipe and rebuild the current build pipeline"
-msgstr "Σβήσιμο και επαναδόμηση της τρέχουσας διοχέτευσης δόμησης"
-
-#: libfoundry/cli/foundry-command-line.c:233
-msgid "Clean the current build pipeline"
-msgstr "Καθαρισμός της τρέχουσας διοχέτευσης δόμησης"
-
-#: libfoundry/cli/foundry-command-line.c:234
-msgid "Run the install target for the project"
-msgstr "Εκτέλεση του στόχου εγκατάστασης για το έργο"
-
-#: libfoundry/cli/foundry-command-line.c:235
-msgid "Deploy the project to the active device"
-msgstr "Ανάπτυξη του έργου στην ενεργή συσκευή"
-
-#: libfoundry/cli/foundry-command-line.c:236
-msgid "Export project artifacts"
-msgstr "Εξαγωγή παραγώγων του έργου"
-
-#: libfoundry/cli/foundry-command-line.c:238
-msgid "Run Commands"
-msgstr "Εντολές εκτέλεσης"
-
-#: libfoundry/cli/foundry-command-line.c:239
-msgid "Run a project command"
-msgstr "Εκτέλεση μιας εντολής έργου"
-
-#. foundry_command_line_print (self, "%s:\n", _("User Commands"));
-#. foundry_command_line_print (self, "  command list         %s\n", _("List registered commands"));
-#. foundry_command_line_print (self, "  command add          %s\n", _("Add a new user command or group"));
-#. foundry_command_line_print (self, "  command remove       %s\n", _("Remove a user command or group"));
-#. foundry_command_line_print (self, "\n");
-#: libfoundry/cli/foundry-command-line.c:250
-msgid "File/Directory Commands"
-msgstr "Εντολές αρχείου/καταλόγου"
-
-#. foundry_command_line_print (self, "  search               %s\n", _("Search the project"));
-#. foundry_command_line_print (self, "  replace              %s\n", _("Search and replace within the project"));
-#. foundry_command_line_print (self, "  index                %s\n", _("Update source code indexes"));
-#. foundry_command_line_print (self, "  format               %s\n", _("Reformat a file"));
-#. foundry_command_line_print (self, "  symbols              %s\n", _("List symbols within a file"));
-#: libfoundry/cli/foundry-command-line.c:256
-msgid "List diagnostics within a file or files"
-msgstr "Λίστα διαγνωστικών εντός ενός αρχείου ή αρχείων"
-
-#: libfoundry/cli/foundry-command-line.c:257
-msgid "Open a file or files in file browser"
-msgstr "Άνοιγμα αρχείου ή αρχείων στον περιηγητή αρχείων"
-
-#: libfoundry/cli/foundry-command-line.c:259
-msgid "Documentation Commands"
-msgstr "Εντολές τεκμηρίωσης"
-
-#: libfoundry/cli/foundry-command-line.c:260
-msgid "List available documentation bundles"
-msgstr "Λίστα διαθέσιμων δεσμών τεκμηρίωσης"
-
-#: libfoundry/cli/foundry-command-line.c:261
-msgid "Install a specific documentation bundle"
-msgstr "Εγκατάσταση συγκεκριμένης δέσμης τεκμηρίωσης"
-
-#: libfoundry/cli/foundry-command-line.c:262
-msgid "Search for documentation"
-msgstr "Αναζήτηση για τεκμηρίωση"
-
-#: libfoundry/cli/foundry-command-line.c:264
-msgid "Configuration Commands"
-msgstr "Εντολές διαμόρφωσης"
-
-#: libfoundry/cli/foundry-command-line.c:265
-msgid "List available configurations"
-msgstr "Λίστα διαθέσιμων διαμορφώσεων"
-
-#: libfoundry/cli/foundry-command-line.c:266
-msgid "Change the active configuration"
-msgstr "Αλλαγή της ενεργής διαμόρφωσης"
-
-#: libfoundry/cli/foundry-command-line.c:268
-msgid "SDK Commands"
-msgstr "Εντολές SDK"
-
-#: libfoundry/cli/foundry-command-line.c:270
-msgid "Install a specific SDK"
-msgstr "Εγκατάσταση ενός συγκεκριμένου SDK"
-
-#: libfoundry/cli/foundry-command-line.c:271
-msgid "Change the active SDK for the build pipeline"
-msgstr "Αλλαγή του ενεργού SDK για τη διοχέτευση δόμησης"
-
-#: libfoundry/cli/foundry-command-line.c:273
-msgid "Pipeline Commands"
-msgstr "Εντολές διοχέτευσης"
-
-#: libfoundry/cli/foundry-command-line.c:274
-msgid "Show information about the pipeline"
-msgstr "Εμφάνιση πληροφοριών σχετικά με τη διοχέτευση"
-
-#: libfoundry/cli/foundry-command-line.c:275
-msgid "Build the current pipeline"
-msgstr "Δόμηση της τρέχουσας διοχέτευσης"
-
-#: libfoundry/cli/foundry-command-line.c:276
-msgid "Rebuild the current pipeline"
-msgstr "Επαναδόμηση της τρέχουσας διοχέτευσης"
-
-#: libfoundry/cli/foundry-command-line.c:277
-msgid "Clean the current pipeline"
-msgstr "Καθαρισμός της τρέχουσας διοχέτευσης"
-
-#: libfoundry/cli/foundry-command-line.c:278
-msgid "Delete contents related to build"
-msgstr "Διαγραφή περιεχομένων σχετικών με τη δόμηση"
-
-#: libfoundry/cli/foundry-command-line.c:279
-msgid "Run pipeline through configure phase"
-msgstr "Εκτέλεση διοχέτευσης μέσω της φάσης ρύθμισης"
-
-#: libfoundry/cli/foundry-command-line.c:282
-msgid "Device Commands"
-msgstr "Εντολές συσκευής"
-
-#: libfoundry/cli/foundry-command-line.c:284
-msgid "Switch the current target device"
-msgstr "Αλλαγή της τρέχουσας συσκευής προορισμού"
-
-#: libfoundry/cli/foundry-command-line.c:288
-msgid "LSP Commands"
-msgstr "Εντολές LSP"
-
-#: libfoundry/cli/foundry-command-line.c:289
-msgid "List available language server plugins"
-msgstr "Λίστα διαθέσιμων προσθέτων εξυπηρετητή γλώσσας"
-
-#: libfoundry/cli/foundry-command-line.c:290
-msgid "Run a language server for specific language"
-msgstr "Εκτέλεση εξυπηρετητή γλώσσας για συγκεκριμένη γλώσσα"
-
-#: libfoundry/cli/foundry-command-line.c:291
-msgid "Set preferred LSP for language"
-msgstr "Ορισμός προτιμώμενου LSP για γλώσσα"
-
-#: libfoundry/cli/foundry-command-line.c:567
+#: libfoundry/cli/foundry-command-line.c:554
 msgid "Yes"
 msgstr "Ναι"
 
-#: libfoundry/cli/foundry-command-line.c:569
+#: libfoundry/cli/foundry-command-line.c:556
 msgid "No"
 msgstr "Όχι"
 
@@ -1485,18 +1664,18 @@ msgid "My Computer"
 msgstr "Ο υπολογιστής μου"
 
 #. translators: %s is replaced with project title
-#: libfoundry/foundry-context.c:1009
+#: libfoundry/foundry-context.c:1081
 #, c-format
 msgid "Project “%s” loaded"
 msgstr "Το έργο «%s» φορτώθηκε"
 
-#: libfoundry/foundry-util.c:469
+#: libfoundry/foundry-util.c:636
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:42
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:93
 msgid "Projects"
 msgstr "Έργα"
 
-#: libfoundry/foundry-util.c:1222
+#: libfoundry/foundry-util.c:1395
 msgid "Building project"
 msgstr "Δόμηση έργου"
 
@@ -1518,31 +1697,21 @@ msgstr "Διαπιστευτήρια"
 msgid "Received %u/%u objects (%s bytes)"
 msgstr "Ελήφθησαν %u/%u αντικείμενα (%s bytes)"
 
-#: libfoundry/git/foundry-git-cloner.c:322
+#: libfoundry/git/foundry-git-cloner.c:326
 msgid "Invalid branch name"
 msgstr "Μη έγκυρο όνομα κλάδου"
 
-#: libfoundry/git/foundry-git-cloner.c:328
+#: libfoundry/git/foundry-git-cloner.c:332
 msgid "Directory must be set"
 msgstr "Πρέπει να οριστεί κατάλογος"
 
-#: libfoundry/git/foundry-git-cloner.c:333
+#: libfoundry/git/foundry-git-cloner.c:337
 msgid "Directory already exists"
 msgstr "Ο κατάλογος υπάρχει ήδη"
 
-#: libfoundry/git/foundry-git-vcs.c:75
+#: libfoundry/git/foundry-git-vcs.c:78
 msgid "Git"
 msgstr "Git"
-
-#: libfoundry-gtk/markup/foundry-markup-view.c:460
-msgid "Cannot load HTML. Missing WebKit support."
-msgstr "Αδυναμία φόρτωσης HTML. Λείπει η υποστήριξη WebKit."
-
-#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
-#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:90
-msgid "Other"
-msgstr "Άλλο"
 
 #: libfoundry/licenses/foundry-license.c:260
 msgid "No License"
@@ -1617,6 +1786,10 @@ msgstr "Προετοιμασία περιβάλλοντος δόμησης"
 #, c-format
 msgid "Possible typo in “%s”. Did you mean “%s”?"
 msgstr "Πιθανό τυπογραφικό στο «%s». Εννοούσατε «%s»;"
+
+#: plugins/codex-acp/plugin-codex-acp-agent.c:481
+msgid "Codex"
+msgstr "Codex"
 
 #: plugins/devhelp/plugin-devhelp-book.c:522
 #: plugins/devhelp/plugin-devhelp-heading.c:611
@@ -1719,7 +1892,7 @@ msgstr "Δημιουργία καταλόγων προετοιμασίας Flatp
 msgid "Prepare Staging Directories"
 msgstr "Προετοιμασία καταλόγων προετοιμασίας"
 
-#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:145
+#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:158
 msgid "Installing"
 msgstr "Εγκατάσταση"
 
@@ -1780,38 +1953,46 @@ msgid "Plugins"
 msgstr "Πρόσθετα"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:54
+msgid "Agents"
+msgstr "Πράκτορες"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:57
+msgid "Continuous Integration"
+msgstr "Συνεχής ενσωμάτωση"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:60
 msgid "Diagnostics"
 msgstr "Διαγνωστικά"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:57
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:63
 msgid "Language Servers"
 msgstr "Εξυπηρετητές γλώσσας"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:60
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:66
 msgid "Search"
 msgstr "Αναζήτηση"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:63
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:69
 msgid "Build Systems"
 msgstr "Συστήματα δόμησης"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:66
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:72
 msgid "SDKs"
 msgstr "SDK"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:69
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:75
 msgid "Templates"
 msgstr "Πρότυπα"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:75
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:81
 msgid "Language Models"
 msgstr "Γλωσσικά μοντέλα"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:78
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
 msgid "Version Control"
 msgstr "Έλεγχος εκδόσεων"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:81
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
 msgid "Devices"
 msgstr "Συσκευές"
 
@@ -1856,7 +2037,7 @@ msgstr "Εξομοίωση riscv64"
 msgid "x64_64 Emulation"
 msgstr "Εξομοίωση x64_64"
 
-#. translators: first %s is replaced with hostname, second %s with the CPU architecture
+#. translators: %s is replaced with hostname
 #: plugins/qemu/plugin-qemu-device-provider.c:136
 #, c-format
 msgid "My Computer (%s)"
@@ -1865,3 +2046,144 @@ msgstr "Ο υπολογιστής μου (%s)"
 #: plugins/sarif/plugin-sarif-build-addin.c:106
 msgid "Clear existing diagnostics"
 msgstr "Εκκαθάριση υπαρχόντων διαγνωστικών"
+
+#~ msgid "List available configs"
+#~ msgstr "Λίστα διαθέσιμων διαμορφώσεων"
+
+#~ msgid "CONFIG - Switch current config"
+#~ msgstr "CONFIG - Εναλλαγή τρέχουσας διαμόρφωσης"
+
+#~ msgid "[-- COMMAND] - Start shell in build environment"
+#~ msgstr "[-- ΕΝΤΟΛΗ] - Εκκίνηση κελύφους σε περιβάλλον δόμησης"
+
+#~ msgid "DEVICE - Switch current device"
+#~ msgstr "DEVICE - Εναλλαγή τρέχουσας συσκευής"
+
+#~ msgid "FILE [FILE...] - Diagnose a file"
+#~ msgstr "ΑΡΧΕΙΟ [ΑΡΧΕΙΟ...] - Διάγνωση αρχείου"
+
+#~ msgid "FORGE - Switch forge to FORGE"
+#~ msgstr "ΣΙΔΗΡΟΥΡΓΕΙΟ - Αλλαγή σιδηρουργείου σε ΣΙΔΗΡΟΥΡΓΕΙΟ"
+
+#~ msgid "MODEL - Complete using a LLM"
+#~ msgstr "ΜΟΝΤΕΛΟ - Συμπλήρωση με χρήση LLM"
+
+#~ msgid "List available lsps"
+#~ msgstr "Λίστα διαθέσιμων lsp"
+
+#~ msgid "KEYWORD - find gir doc in markdown"
+#~ msgstr "ΛΕΞΗ-ΚΛΕΙΔΙ - εύρεση τεκμηρίωσης gir σε markdown"
+
+#~ msgid "List information about pipeline"
+#~ msgstr "Λίστα πληροφοριών σχετικά με τη διοχέτευση"
+
+#~ msgid "PROGRAM - Look for PROGRAM in build pipeline"
+#~ msgstr "ΠΡΟΓΡΑΜΜΑ - Αναζήτηση για ΠΡΟΓΡΑΜΜΑ στη διοχέτευση δόμησης"
+
+#~ msgid "[-- COMMAND...] - Run the application"
+#~ msgstr "[-- ΕΝΤΟΛΗ...] - Εκτέλεση της εφαρμογής"
+
+#~ msgid "SDK_ID - Install a SDK"
+#~ msgstr "ΑΝΑΓΝΩΡΙΣΤΙΚΟ_SDK - Εγκατάσταση ενός SDK"
+
+#~ msgid "SDK PROGRAM - Look for PROGRAM in SDK"
+#~ msgstr "SDK ΠΡΟΓΡΑΜΜΑ - Αναζήτηση για ΠΡΟΓΡΑΜΜΑ στο SDK"
+
+#~ msgid "SCHEMA KEY - Get setting"
+#~ msgstr "ΣΧΗΜΑ ΚΛΕΙΔΙ - Λήψη ρύθμισης"
+
+#~ msgid "SCHEMA KEY - Set setting"
+#~ msgstr "ΣΧΗΜΑ ΚΛΕΙΔΙ - Ορισμός ρύθμισης"
+
+#~ msgid "TEST - Run a test"
+#~ msgstr "ΔΟΚΙΜΗ - Εκτέλεση μιας δοκιμής"
+
+#~ msgid "FILE - Print commit blame information"
+#~ msgstr "ΑΡΧΕΙΟ - Εκτύπωση πληροφοριών χρέωσης (blame) της υποβολής"
+
+#~ msgid "FILE - Print commit fetch information"
+#~ msgstr "ΑΡΧΕΙΟ - Εκτύπωση πληροφοριών ανάκτησης υποβολής"
+
+#~ msgid "FILE - Check if FILE is ignored"
+#~ msgstr "ΑΡΧΕΙΟ - Έλεγχος αν το ΑΡΧΕΙΟ αγνοείται"
+
+#~ msgid "Usage:"
+#~ msgstr "Χρήση:"
+
+#~ msgid "Initialize a new project in current directory"
+#~ msgstr "Αρχικοποίηση νέου έργου στον τρέχοντα κατάλογο"
+
+#~ msgid "Environment Commands"
+#~ msgstr "Εντολές περιβάλλοντος"
+
+#~ msgid "Enter environment of project in current directory"
+#~ msgstr "Είσοδος στο περιβάλλον του έργου στον τρέχοντα κατάλογο"
+
+#~ msgid "Enter build environment for project"
+#~ msgstr "Είσοδος στο περιβάλλον δόμησης για το έργο"
+
+#~ msgid "Build Commands"
+#~ msgstr "Εντολές δόμησης"
+
+#~ msgid "Build the current build pipeline"
+#~ msgstr "Δόμηση της τρέχουσας διοχέτευσης δόμησης"
+
+#~ msgid "Wipe and rebuild the current build pipeline"
+#~ msgstr "Σβήσιμο και επαναδόμηση της τρέχουσας διοχέτευσης δόμησης"
+
+#~ msgid "Clean the current build pipeline"
+#~ msgstr "Καθαρισμός της τρέχουσας διοχέτευσης δόμησης"
+
+#~ msgid "Run the install target for the project"
+#~ msgstr "Εκτέλεση του στόχου εγκατάστασης για το έργο"
+
+#~ msgid "Deploy the project to the active device"
+#~ msgstr "Ανάπτυξη του έργου στην ενεργή συσκευή"
+
+#~ msgid "File/Directory Commands"
+#~ msgstr "Εντολές αρχείου/καταλόγου"
+
+#~ msgid "List diagnostics within a file or files"
+#~ msgstr "Λίστα διαγνωστικών εντός ενός αρχείου ή αρχείων"
+
+#~ msgid "Open a file or files in file browser"
+#~ msgstr "Άνοιγμα αρχείου ή αρχείων στον περιηγητή αρχείων"
+
+#~ msgid "Documentation Commands"
+#~ msgstr "Εντολές τεκμηρίωσης"
+
+#~ msgid "Install a specific documentation bundle"
+#~ msgstr "Εγκατάσταση συγκεκριμένης δέσμης τεκμηρίωσης"
+
+#~ msgid "Configuration Commands"
+#~ msgstr "Εντολές διαμόρφωσης"
+
+#~ msgid "SDK Commands"
+#~ msgstr "Εντολές SDK"
+
+#~ msgid "Change the active SDK for the build pipeline"
+#~ msgstr "Αλλαγή του ενεργού SDK για τη διοχέτευση δόμησης"
+
+#~ msgid "Pipeline Commands"
+#~ msgstr "Εντολές διοχέτευσης"
+
+#~ msgid "Clean the current pipeline"
+#~ msgstr "Καθαρισμός της τρέχουσας διοχέτευσης"
+
+#~ msgid "Delete contents related to build"
+#~ msgstr "Διαγραφή περιεχομένων σχετικών με τη δόμηση"
+
+#~ msgid "Run pipeline through configure phase"
+#~ msgstr "Εκτέλεση διοχέτευσης μέσω της φάσης ρύθμισης"
+
+#~ msgid "Device Commands"
+#~ msgstr "Εντολές συσκευής"
+
+#~ msgid "LSP Commands"
+#~ msgstr "Εντολές LSP"
+
+#~ msgid "Run a language server for specific language"
+#~ msgstr "Εκτέλεση εξυπηρετητή γλώσσας για συγκεκριμένη γλώσσα"
+
+#~ msgid "Set preferred LSP for language"
+#~ msgstr "Ορισμός προτιμώμενου LSP για γλώσσα"
