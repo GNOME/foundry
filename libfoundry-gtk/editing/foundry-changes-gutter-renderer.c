@@ -180,13 +180,25 @@ foundry_changes_gutter_renderer_snapshot_flush_run (Snapshot *state)
   if (state->run_width >= RUN_ROUNDED_MIN_WIDTH)
     {
       GskRoundedRect rounded = GSK_ROUNDED_RECT_INIT (0, 0, 0, 0);
+      GdkRGBA fill = *state->run_color;
+      GdkRGBA border_colors[4] = {
+        *state->run_color,
+        *state->run_color,
+        *state->run_color,
+        *state->run_color,
+      };
+      const float border_widths[4] = { 1, 1, 1, 1 };
 
       gsk_rounded_rect_init_from_rect (&rounded, &rect, state->run_width / 2.0f);
       gsk_rounded_rect_normalize (&rounded);
 
+      fill.alpha *= 0.5;
+
       gtk_snapshot_push_rounded_clip (state->snapshot, &rounded);
-      gtk_snapshot_append_color (state->snapshot, state->run_color, &rect);
+      gtk_snapshot_append_color (state->snapshot, &fill, &rect);
       gtk_snapshot_pop (state->snapshot);
+
+      gtk_snapshot_append_border (state->snapshot, &rounded, border_widths, border_colors);
     }
   else
     {
