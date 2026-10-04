@@ -3,28 +3,29 @@
 # This file is distributed under the same license as the foundry package.
 # Hugo Carvalho <hugokarvalho@hotmail.com>, 2026.
 #
+# SPDX-FileCopyrightText: 2026 Cátia Silva <catias89@gmail.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
-"POT-Creation-Date: 2026-02-09 20:19+0000\n"
-"PO-Revision-Date: 2026-03-05 11:09+0000\n"
-"Last-Translator: Hugo Carvalho <hugokarvalho@hotmail.com>\n"
-"Language-Team: Portuguese <pt@li.org>\n"
+"POT-Creation-Date: 2026-09-22 09:18+0000\n"
+"PO-Revision-Date: 2026-10-04 21:54+0100\n"
+"Last-Translator: Cátia Silva <catias89@gmail.com>\n"
+"Language-Team: Portuguese <li@pt.corg>\n"
 "Language: pt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.8\n"
+"X-Generator: Lokalize 23.08.5\n"
 
 #: libfoundry-adw/foundry-search-dialog.ui:34
 msgid "Search for anything"
-msgstr "Procure por qualquer coisa"
+msgstr "Procure qualquer coisa"
 
 #: libfoundry-adw/foundry-search-dialog.ui:87
 msgid "Type to Search"
-msgstr "Digite para pesquisar"
+msgstr "Escreva para pesquisar"
 
 #: libfoundry-adw/foundry-search-dialog.ui:88
 msgid "Prefix your query with one of the following to filter results"
@@ -40,7 +41,7 @@ msgid "Symbols"
 msgstr "Símbolos"
 
 #: libfoundry-adw/foundry-search-dialog.ui:144
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:72
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:78
 msgid "Documentation"
 msgstr "Documentação"
 
@@ -58,15 +59,25 @@ msgstr "Tente uma pesquisa diferente"
 
 #: libfoundry-adw/foundry-workspace.ui:51
 msgid "Show Panels"
-msgstr "Mostrar painéis"
+msgstr "Apresentar painéis"
 
 #: libfoundry-adw/foundry-workspace.ui:79
 msgid "Information"
-msgstr "Informações"
+msgstr "Informação"
+
+#: libfoundry-gtk/markup/foundry-markup-view.c:460
+msgid "Cannot load HTML. Missing WebKit support."
+msgstr "Não foi possível carregar o HTML. Suporte WebKit ausente."
+
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
+#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:96
+msgid "Other"
+msgstr "Outro"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:44
 msgid "Keyboard Shortcuts"
-msgstr "Teclas de atalho"
+msgstr "Atalhos de Teclado"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:52
 msgid "Text Editor"
@@ -80,327 +91,330 @@ msgstr "Terminal"
 msgid "Programming Languages"
 msgstr "Linguagens de programação"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:93
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:568
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:94
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:569
 msgid "Fonts & Styling"
 msgstr "Tipos de letra e estilos"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:107
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:574
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:108
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:575
 msgid "Use Custom Font"
-msgstr "Use tipo de letra personalizada"
+msgstr "Utilize um tipo de letra personalizado"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:118
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:584
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:119
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:585
 msgid "Custom Font"
-msgstr "Tipo de letra personalizada"
+msgstr "Tipo de letra personalizado"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:131
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:132
 msgid "Indentation & Formatting"
-msgstr "Recuo e formatação"
+msgstr "Indentação e formatação"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:140
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:141
 msgid "Formatting"
 msgstr "Formatação"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:145
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:146
 msgid "Trailing Newline"
 msgstr "Quebra de linha final"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:146
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:147
 msgid "Ensure files end with a new line"
-msgstr "Certifique-se de que os ficheiros terminem com uma nova linha"
+msgstr "Certifique-se de que os ficheiros terminam com uma nova linha"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:159
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:160
 msgid "Indentation"
-msgstr "Identação"
-
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:164
-msgid "Auto Indent"
-msgstr "Identação automática"
+msgstr "Indentação"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:165
-msgid "Automatically indent while you type"
-msgstr "Identação automática enquanto digita"
+msgid "Auto Indent"
+msgstr "Indentação automática"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:176
-msgid "Indent Selections on Tab"
-msgstr "Identar seleções com Tab"
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:166
+msgid "Automatically indent while you type"
+msgstr "Indentação automática enquanto digita"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:177
-msgid "Indent selections when tab is pressed"
-msgstr "A seleção é identada quando a tecla Tab é pressionada"
+msgid "Indent Selections on Tab"
+msgstr "Indentar seleções com Tab"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:194
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:178
+msgid "Indent selections when tab is pressed"
+msgstr "A seleção é indentada quando a tecla Tab é pressionada"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
 msgid "Insert Spaces Instead of Tabs"
 msgstr "Inserir espaços em vez de tabulação"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:195
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:196
 msgid "Insert spaces instead of tabs when tab is pressed"
 msgstr "Ao pressionar a tecla Tab, insira espaços em vez de tabulações"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:206
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
 msgid "Tab Width"
 msgstr "Largura da tabulação"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:207
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:208
 msgid "The width of a tab in characters"
 msgstr "A largura de uma tabulação em caracteres"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:218
-msgid "Override Indent Width"
-msgstr "Alterar largura da identação"
-
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:219
-msgid "Specify an indentation width separate from the tab width"
-msgstr "Especifique uma largura de identação separada da largura da tabulação."
+msgid "Override Indent Width"
+msgstr "Alterar largura da indentação"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:230
-msgid "Indent Width"
-msgstr "Largura da identação"
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:220
+msgid "Specify an indentation width separate from the tab width"
+msgstr "Especifique uma largura de indentação separada da largura da tabulação"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:231
-msgid "The width to indent in characters"
-msgstr "A largura da identação em caracteres"
+msgid "Indent Width"
+msgstr "Largura da indentação"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:243
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:232
+msgid "The width to indent in characters"
+msgstr "A largura da indentação em caracteres"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:244
 msgid "Margin"
 msgstr "Margem"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:249
-msgid "Show Right Margin"
-msgstr "Mostrar margem direita"
-
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:250
-msgid "Draw an indicator showing the right margin position"
-msgstr "Desenha um indicador mostrando a posição da margem direita"
+msgid "Show Right Margin"
+msgstr "Apresentar margem direita"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:261
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:251
+msgid "Draw an indicator showing the right margin position"
+msgstr "Desenha um indicador que apresenta a posição da margem direita"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:262
 msgid "Right Margin Position"
 msgstr "Posição da margem direita"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:262
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:263
 msgid "The offset in characters where the right margin should be drawn"
 msgstr "O deslocamento em caracteres onde a margem direita deve ser desenhada"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:274
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:275
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:90
 msgid "Completion"
 msgstr "Conclusão"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:286
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
 msgid "Complete while Typing"
 msgstr "Completar enquanto digita"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:287
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:288
 msgid "Automatically complete words and syntax while typing"
 msgstr "Completar automaticamente palavras e sintaxe enquanto digita"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:303
-msgid "Select First Proposal"
-msgstr "Selecione a primeira proposta"
-
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:304
+msgid "Select First Proposal"
+msgstr "Seleciona a primeira proposta"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:305
 msgid "Automatically select the first completion proposal"
 msgstr "Seleciona automaticamente a primeira proposta de conclusão"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:315
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:316
 msgid "Maximum Completion Proposals"
 msgstr "Máximo das propostas de conclusão"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:316
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:317
 msgid "The maximum number of completion rows that will be displayed at once"
 msgstr ""
 "O número máximo de linhas de conclusão que serão exibidas simultaneamente"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:328
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:329
 msgid "Smart Keybindings"
 msgstr "Atalhos de teclado inteligentes"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:334
-msgid "Smart Backspace"
-msgstr "Backspace inteligente"
-
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:335
+msgid "Smart Backspace"
+msgstr "Recuo inteligente"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:336
 msgid "Remove additional spaces when using backspace to align with tabs"
 msgstr ""
-"Remove espaços adicionais ao usar a tecla Backspace para alinhar com as "
+"Remove espaços adicionais ao utilizar a tecla Backspace para alinhar com as "
 "tabulações"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:346
-msgid "Smart Home End"
-msgstr "Home End inteligente"
-
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:347
-msgid "Move to content instead of line ends when pressing Home/End"
-msgstr "Mova o cursor para as extremidades das linhas ao pressionar Home/End"
+msgid "Smart Home End"
+msgstr "Início/Fim inteligentes"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:359
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:348
+msgid "Move to content instead of line ends when pressing Home/End"
+msgstr ""
+"Mova o cursor para as extremidades das linhas ao pressionar as teclas"
+" Início/Fim"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:360
 msgid "Braces"
 msgstr "Chavetas"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:365
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
 msgid "Insert Matching Brace"
 msgstr "Inserir chaveta correspondente"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:366
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:367
 msgid "Insert matching braces when typing an opening brace"
 msgstr "Insira chavetas correspondentes ao digitar uma chaveta de abertura"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:377
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
 msgid "Overwrite Matching Brace"
 msgstr "Sobrescrever chaveta correspondente"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:378
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:379
 msgid "Overwrite matching braces when typing"
-msgstr "Sobrescreve chaves correspondentes ao digitar"
+msgstr "Sobrescreve chavetas correspondentes ao digitar"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:395
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:396
 msgid "Wrap Text"
 msgstr "Quebrar texto"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:408
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:409
 msgid "Lines"
 msgstr "Linhas"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:413
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:414
 msgid "Line Height"
 msgstr "Altura da linha"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:430
-msgid "Show Line Numbers"
-msgstr "Mostrar números das linhas"
-
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:431
+msgid "Show Line Numbers"
+msgstr "Apresentar números das linhas"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:432
 msgid "Show line numbers next to each line"
 msgstr "Exibir os números das linhas ao lado de cada linha"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:448
-msgid "Show Line Changes"
-msgstr "Mostrar alterações de linha"
-
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:449
+msgid "Show Line Changes"
+msgstr "Apresentar alterações de linha"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:450
 msgid "Describe how a line was changed next to each line"
 msgstr "Descreva como uma linha foi alterada ao lado de cada linha"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:460
-msgid "Show Change Overview"
-msgstr "Mostrar visão geral das alterações"
-
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:461
+msgid "Show Change Overview"
+msgstr "Apresentar visão geral de alterações"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:462
 msgid "Show an overview of changes to the entire document"
 msgstr "Apresentar uma visão geral das alterações em todo o documento"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:473
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:474
 msgid "Highlighting"
 msgstr "Destaque"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:479
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:480
 msgid "Highlight Current Line"
 msgstr "Destacar linha atual"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:480
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:481
 msgid "Make the current line stand out with highlights"
-msgstr "Faça a linha atual ficar com destaque"
-
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:491
-msgid "Highlight Matching Brackets"
-msgstr "Destaque os parênteses correspondentes"
+msgstr "Faça a linha atual ficar destacada"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:492
+msgid "Highlight Matching Brackets"
+msgstr "Destaque os parêntesis correspondentes"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:493
 msgid ""
 "Use cursor position to highlight matching brackets, braces, parenthesis, and "
 "more"
 msgstr ""
-"Use a posição do cursor para destacar parênteses retos, chaves, chavetas, "
-"parênteses e outros sinais correspondentes"
+"Utilize a posição do cursor para destacar parêntesis retos, chaves, chavetas, "
+"parêntesis e outros sinais correspondentes"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:509
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
 msgid "Highlight Diagnostics"
 msgstr "Destaque os diagnósticos"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:510
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:511
 msgid "Show diagnostics in the text editor"
 msgstr "Exibir diagnósticos no editor de texto"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:522
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:523
 msgid "Behavior"
 msgstr "Comportamento"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:535
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:536
 msgid "Check Spelling"
 msgstr "Verificar ortografia"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:536
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:537
 msgid "Automatically check spelling as you type"
 msgstr "Verifica automaticamente a ortografia enquanto digita"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:553
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
 msgid "Use Snippets"
 msgstr "Usar trechos"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:554
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:555
 msgid "Automatically expand snippets when pressing tab"
 msgstr "Expande automaticamente os trechos ao pressionar a tecla Tab"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:601
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
 msgid "Allow Bold"
 msgstr "Permitir Negrito"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:602
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:603
 msgid "Allow the use of bold escape sequences"
-msgstr "Permite o uso de negrito em sequências de escape"
+msgstr "Permite a utilização de negrito em sequências de escape"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:612
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
 msgid "Allow Hyperlinks"
 msgstr "Permitir hiperligações"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:613
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:614
 msgid "Allow the use of hyperlinks escape sequences"
-msgstr "Permite o uso de sequências de escape de Hyperlinks"
+msgstr "Permite a utilização de sequências de escape de hiperligações"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:624
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:625
 msgid "Scrolling"
-msgstr "Rolagem"
-
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:630
-msgid "Scroll On Output"
-msgstr "Rolar na saída"
+msgstr "Deslocamento"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:631
-msgid "Automatically scroll when applications within the terminal output text"
-msgstr "Rola automaticamente quando aplicações dentro do terminal exibem texto"
+msgid "Scroll On Output"
+msgstr "Deslocar na saída"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:641
-msgid "Scroll On Keyboard Input"
-msgstr "Rolar na entrada do teclado"
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:632
+msgid "Automatically scroll when applications within the terminal output text"
+msgstr ""
+"Desloca automaticamente quando as aplicações dentro do terminal exibem texto"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:642
-msgid "Automatically scroll when typing to insert text"
-msgstr "Rola automaticamente quando digitar para inserir texto"
+msgid "Scroll On Keyboard Input"
+msgstr "Deslocar na entrada do teclado"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:653
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:643
+msgid "Automatically scroll when typing to insert text"
+msgstr "Desloca automaticamente quando digitar para inserir texto"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:654
 msgid "History"
 msgstr "Histórico"
 
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:659
-msgid "Limit Scrollback"
-msgstr "Limitar rolagem"
-
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:660
+msgid "Limit Scrollback"
+msgstr "Limitar deslocamento"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:661
 msgid ""
 "Limit the number of lines that are stored in memory for terminal scrollback"
 msgstr ""
-"Limita o número de linhas armazenadas na memória para rolagem do terminal"
-
-#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:670
-msgid "Maximum Lines in Scrollback"
-msgstr "Número máximo de linhas na rolagem"
+"Limita o número de linhas armazenadas na memória para deslocamento do terminal"
 
 #: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:671
+msgid "Maximum Lines in Scrollback"
+msgstr "Número máximo de linhas no deslocamento"
+
+#: libfoundry-gtk/tweaks/foundry-gtk-tweak-provider.c:672
 msgid "The maximum number of lines stored in history when limiting scrollback"
 msgstr ""
-"O número máximo de linhas armazenadas no histórico ao limitar a rolagem"
+"O número máximo de linhas armazenadas no histórico ao limitar o deslocamento"
 
 #: libfoundry/build/foundry-build-manager.c:594
 msgid "Project does not contain an active build configuration"
@@ -426,46 +440,77 @@ msgstr "A remover %s\n"
 msgid "Build %s"
 msgstr "Compilar %s"
 
+#: libfoundry/ci/foundry-ci-provider.c:297
+#| msgid "Run Commands"
+msgid "Run CI jobs"
+msgstr "Executar tarefas de integração contínua"
+
+#: libfoundry/ci/foundry-ci-provider.c:298
+msgid "Run CI pipeline"
+msgstr "Executar a pipeline de integração contínua"
+
 #: libfoundry/cli/foundry-cli-builtin-build.c:142
 #, c-format
 msgid "Failed to acquire suspend inhibitor: %s\n"
 msgstr "Falha ao adquirir o inibidor de suspensão: %s\n"
 
-#: libfoundry/cli/foundry-cli-builtin-build.c:379
-msgid "Show help"
-msgstr "Exibir ajuda"
-
-#: libfoundry/cli/foundry-cli-builtin-build.c:380
-msgid "Inhibit system suspend while building"
-msgstr "Inibir a suspensão do sistema durante a compilação"
-
-#: libfoundry/cli/foundry-cli-builtin-build.c:387
+#: libfoundry/cli/foundry-cli-builtin-build.c:355
 msgid "Build the project"
 msgstr "Compilar o projeto"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:113
-#: libfoundry/cli/foundry-cli-builtin-init.c:96
-msgid "The directory to initialize, default is current"
-msgstr "O diretório a ser inicializado, o padrão está ativo"
+#: libfoundry/cli/foundry-cli-builtin-build.c:357
+#| msgid "Build the current pipeline"
+msgid "Build the pipeline"
+msgstr "Compilar a pipeline"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:113
-#: libfoundry/cli/foundry-cli-builtin-init.c:96
-#: libfoundry/cli/foundry-command-line.c:84
-msgid "DIR"
-msgstr "DIR"
+#: libfoundry/cli/foundry-cli-builtin-build.c:360
+#| msgid "Build the project"
+msgid "Rebuild the project"
+msgstr "Recompilar o projeto"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:114
-msgid "Specify a branch name to clone"
-msgstr "Especifique um nome de branch para clonar"
+#: libfoundry/cli/foundry-cli-builtin-build.c:362
+#| msgid "Rebuild the current pipeline"
+msgid "Rebuild the pipeline"
+msgstr "Recompilar a pipeline"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:114
-msgid "Branch"
-msgstr "Branch"
+#: libfoundry/cli/foundry-cli-builtin-build.c:365
+msgid "Clean build outputs"
+msgstr "Limpar saída de compilação"
 
-#: libfoundry/cli/foundry-cli-builtin-clone.c:123
-msgid "URI - Clone a Git repository"
-msgstr "URI - Clonar um repositório Git"
+#: libfoundry/cli/foundry-cli-builtin-build.c:367
+msgid "Clean pipeline outputs"
+msgstr "Limpar saída da pipeline"
 
+#: libfoundry/cli/foundry-cli-builtin-build.c:370
+msgid "Purge pipeline state"
+msgstr "Apagar o estado da pipeline"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:373
+#: libfoundry/cli/foundry-cli-builtin-build.c:375
+#| msgid "Install CMake Project"
+msgid "Install the project"
+msgstr "Instalar o projeto"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:378
+#: libfoundry/cli/foundry-cli-builtin-build.c:380
+msgid "Export project artifacts"
+msgstr "Exportar artefactos do projeto"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:383
+#| msgid "Invalidate the build pipeline"
+msgid "Configure the build pipeline"
+msgstr "Configurar a pipeline de compilação"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:392
+#: libfoundry/cli/foundry-cli-command-tree.c:787
+msgid "Show help"
+msgstr "Apresentar ajuda"
+
+#: libfoundry/cli/foundry-cli-builtin-build.c:393
+msgid "Inhibit system suspend while building"
+msgstr "Inibir a suspensão do sistema durante a compilação"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:190
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:61
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:66
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-list.c:51
@@ -478,11 +523,178 @@ msgstr "URI - Clonar um repositório Git"
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:49
 #: libfoundry/cli/foundry-cli-builtin-test-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:51
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:51
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-vcs-log.c:54
 msgid "ID"
 msgstr "ID"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:191
+msgid "Stage"
+msgstr "Stage"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:192
+#| msgid "Description"
+msgid "Disposition"
+msgstr "Disposição"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:193
+msgid "Reason"
+msgstr "Motivo"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:194
+msgid "Image"
+msgstr "Imagem"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:354
+msgid "Bound concurrent jobs"
+msgstr "Limitar tarefas simultâneas"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:354
+#| msgid "No"
+msgid "N"
+msgstr "N"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:355
+#| msgid "List only closed issues"
+msgid "Use only cached includes"
+msgstr "Utilizar apenas ficheiros incluídos em cache"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:356
+msgid "Stop after the first failure"
+msgstr "Parar após a primeira falha"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:357
+msgid "Store outputs below DIR"
+msgstr "Armazenar saídas dentro do DIRETÓRIO"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:357
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:96
+#: libfoundry/cli/foundry-cli-builtin-private.h:135
+msgid "DIR"
+msgstr "DIRETÓRIO"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:358
+msgid "Preserve diagnostic state"
+msgstr "Preservar estado do diagnóstico"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:359
+msgid "Preserve job workspaces"
+msgstr "Preservar espaços de trabalho das tarefas"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:372
+msgid "Remove cached CI outputs"
+msgstr "Remover saídas de integração contínua em cache"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:379
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "Output format (text, json)"
+msgstr "Formato de saída (texto, json)"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:379
+#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
+#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
+#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
+#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
+#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
+#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
+#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
+#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
+#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
+#: libfoundry/cli/foundry-cli-builtin-grep.c:220
+#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
+#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
+#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
+#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
+#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
+#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
+#: libfoundry/cli/foundry-cli-builtin-search.c:108
+#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
+msgid "FORMAT"
+msgstr "FORMATO"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:384
+msgid "List local CI jobs"
+msgstr "Listar tarefas locais de integração contínua"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:393
+msgid "Run local CI jobs"
+msgstr "Rodar tarefas locais de integração contínua"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:394
+msgid "[JOB…]"
+msgstr "[TAREFA…]"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:402
+msgid "Open a shell for a CI job"
+msgstr "Abrir um shell para uma tarefa de integração contínua"
+
+#: libfoundry/cli/foundry-cli-builtin-ci.c:403
+msgid "JOB"
+msgstr "TAREFA"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:113
+#: libfoundry/cli/foundry-cli-builtin-init.c:96
+msgid "The directory to initialize, default is current"
+msgstr "O diretório a ser inicializado, o padrão está ativo"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:114
+msgid "Specify a branch name to clone"
+msgstr "Especifique um nome de branch para clonar"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:114
+msgid "Branch"
+msgstr "Branch"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:124
+#| msgid "URI - Clone a Git repository"
+msgid "Clone a Git repository"
+msgstr "Clonar um repositório Git"
+
+#: libfoundry/cli/foundry-cli-builtin-clone.c:125
+#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
+msgid "URI"
+msgstr "URI"
 
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:62
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:67
@@ -515,88 +727,30 @@ msgstr "Sistema de compilação"
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:47
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:60
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:52
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:51
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:52
+#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:51
 msgid "Name"
 msgstr "Nome"
 
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
-#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
-#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
-#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
-#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
-#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
-#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
-#: libfoundry/cli/foundry-cli-builtin-grep.c:220
-#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
-#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
-#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
-#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
-#: libfoundry/cli/foundry-cli-builtin-search.c:108
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
-msgid "Output format (text, json)"
-msgstr "Formato de saída (texto, json)"
-
-#: libfoundry/cli/foundry-cli-builtin-config-list.c:108
-#: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:109
-#: libfoundry/cli/foundry-cli-builtin-device-list.c:133
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:131
-#: libfoundry/cli/foundry-cli-builtin-doc-query.c:126
-#: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:124
-#: libfoundry/cli/foundry-cli-builtin-forge-list.c:81
-#: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:128
-#: libfoundry/cli/foundry-cli-builtin-forge-project.c:97
-#: libfoundry/cli/foundry-cli-builtin-forge-user.c:100
-#: libfoundry/cli/foundry-cli-builtin-grep.c:220
-#: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:87
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:92
-#: libfoundry/cli/foundry-cli-builtin-llm-list-tools.c:90
-#: libfoundry/cli/foundry-cli-builtin-lsp-list.c:84
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:110
-#: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:88
-#: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:92
-#: libfoundry/cli/foundry-cli-builtin-sdk-list.c:107
-#: libfoundry/cli/foundry-cli-builtin-search.c:108
-#: libfoundry/cli/foundry-cli-builtin-template-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-list.c:89
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:120
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-list.c:87
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:109
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:92
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:94
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:117
-msgid "FORMAT"
-msgstr "FORMAT"
-
 #: libfoundry/cli/foundry-cli-builtin-config-list.c:115
-msgid "List available configs"
-msgstr "Listar configurações disponíveis"
+#| msgid "List available configurations"
+msgid "List available build configurations"
+msgstr "Listar configurações de compilação disponíveis"
 
 #: libfoundry/cli/foundry-cli-builtin-config-switch.c:133
 msgid "Set config as default for all project contributors"
 msgstr ""
 "Definir configuração como padrão para todos os contribuidores do projeto"
 
-#: libfoundry/cli/foundry-cli-builtin-config-switch.c:140
-msgid "CONFIG - Switch current config"
-msgstr "CONFIG - Alternar configuração atual"
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:141
+#| msgid "Change the active configuration"
+msgid "Switch the current build configuration"
+msgstr "Alterar a configuração de compilação atual"
+
+#: libfoundry/cli/foundry-cli-builtin-config-switch.c:142
+msgid "CONFIG_ID"
+msgstr "ID_DA_CONFIGURAÇÃO"
 
 #: libfoundry/cli/foundry-cli-builtin-ctags.c:86
 msgid "ctags service not available"
@@ -610,9 +764,20 @@ msgstr "nenhum dado ctags disponível"
 msgid "failed to write ctags data"
 msgstr "falha ao gravar dados ctags"
 
-#: libfoundry/cli/foundry-cli-builtin-ctags.c:137
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:138
 msgid "Index a file and output ctags data"
 msgstr "Indexar um ficheiro e gerar dados ctags"
+
+#: libfoundry/cli/foundry-cli-builtin-ctags.c:139
+#: libfoundry/cli/foundry-cli-builtin-guess-language.c:115
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:118
+#: libfoundry/cli/foundry-cli-builtin-show.c:111
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:191
+#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:167
+#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:113
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:126
+msgid "FILE"
+msgstr "FICHEIRO"
 
 #: libfoundry/cli/foundry-cli-builtin-dependencies-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:50
@@ -636,12 +801,20 @@ msgid "Update dependencies"
 msgstr "Atualizar dependências"
 
 #: libfoundry/cli/foundry-cli-builtin-deploy.c:93
-msgid "Deploy the application to active device"
-msgstr "Implantar a aplicação no dispositivo ativo"
+#| msgid "Deploy the application to active device"
+msgid "Deploy the application to the active device"
+msgstr "Implantar o aplicativo no dispositivo ativo"
 
-#: libfoundry/cli/foundry-cli-builtin-devenv.c:130
-msgid "[-- COMMAND] - Start shell in build environment"
-msgstr "[-- COMMAND] - Iniciar shell no ambiente de compilação"
+#: libfoundry/cli/foundry-cli-builtin-devenv.c:131
+#: libfoundry/cli/foundry-cli-builtin-shell.c:157
+#| msgid "- Start shell in build environment"
+msgid "Start a shell in the build environment"
+msgstr "Iniciar shell no ambiente de compilação"
+
+#: libfoundry/cli/foundry-cli-builtin-devenv.c:132
+#: libfoundry/cli/foundry-cli-builtin-run.c:138
+msgid "[-- COMMAND…]"
+msgstr "[-- COMANDO…]"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:69
 msgid "Chassis"
@@ -654,7 +827,6 @@ msgid "System"
 msgstr "Sistema"
 
 #: libfoundry/cli/foundry-cli-builtin-device-list.c:140
-#: libfoundry/cli/foundry-command-line.c:283
 msgid "List available devices"
 msgstr "Listar dispositivos disponíveis"
 
@@ -662,9 +834,14 @@ msgstr "Listar dispositivos disponíveis"
 msgid "Set device as default for all project contributors"
 msgstr "Define dispositivo como padrão para todos os contribuidores do projeto"
 
-#: libfoundry/cli/foundry-cli-builtin-device-switch.c:140
-msgid "DEVICE - Switch current device"
-msgstr "DISPOSITIVO - Alternar dispositivo atual"
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:141
+#| msgid "Switch the current target device"
+msgid "Switch the current device"
+msgstr "Alternar o dispositivo atual"
+
+#: libfoundry/cli/foundry-cli-builtin-device-switch.c:142
+msgid "DEVICE_ID"
+msgstr "ID_DO_DISPOSITIVO"
 
 #: libfoundry/cli/foundry-cli-builtin-diagnose.c:63
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:51
@@ -692,9 +869,14 @@ msgstr "Regra"
 msgid "Message"
 msgstr "Mensagem"
 
-#: libfoundry/cli/foundry-cli-builtin-diagnose.c:138
-msgid "FILE [FILE...] - Diagnose a file"
-msgstr "FICHEIRO [FICHEIRO...] - Diagnosticar um ficheiro"
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:139
+#| msgid "Diagnostics"
+msgid "Diagnose files"
+msgstr "Diagnosticar ficheiros"
+
+#: libfoundry/cli/foundry-cli-builtin-diagnose.c:140
+msgid "FILE…"
+msgstr "FICHEIRO…"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-bundle-install.c:154
 msgid "Installing Documentation"
@@ -742,7 +924,7 @@ msgstr "Listar pacotes de documentação"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:127
 msgid "Function to search for"
-msgstr "Função a ser pesquisada"
+msgstr "Função a pesquisar"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:127
 msgid "FUNCTION"
@@ -750,7 +932,7 @@ msgstr "FUNÇÃO"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:128
 msgid "Property to search for"
-msgstr "Propriedade a ser pesquisada"
+msgstr "Propriedade a pesquisar"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:128
 msgid "PROPERTY"
@@ -758,7 +940,7 @@ msgstr "PROPRIEDADE"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:129
 msgid "Type to search for"
-msgstr "Tipo para pesquisar"
+msgstr "Tipo a pesquisar"
 
 #: libfoundry/cli/foundry-cli-builtin-doc-query.c:129
 msgid "TYPE"
@@ -775,8 +957,10 @@ msgstr "Consultar documentação"
 #: libfoundry/cli/foundry-cli-builtin-enter.c:113
 #: libfoundry/cli/foundry-cli-builtin-init.c:66
 #: libfoundry/cli/foundry-cli-builtin-init.c:80
-#: libfoundry/cli/foundry-command-line.c:110
-#: libfoundry/cli/foundry-command-line.c:135
+#: libfoundry/cli/foundry-command-line.c:158
+#: libfoundry/cli/foundry-command-line.c:194
+#: libfoundry/cli/foundry-command-line.c:207
+#: libfoundry/cli/foundry-command-line.c:304
 msgid "error"
 msgstr "erro"
 
@@ -790,7 +974,7 @@ msgstr "Falha ao iniciar o shell"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:114
 msgid "Child shell exited"
-msgstr "Shell dependente encerrado"
+msgstr "Shell filho encerrado"
 
 #: libfoundry/cli/foundry-cli-builtin-enter.c:139
 msgid "Start a shell within a foundry project"
@@ -798,11 +982,16 @@ msgstr "Iniciar um shell dentro de um projeto Foundry"
 
 #: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:160
 msgid "Print parent symbols as a tree"
-msgstr "Imprimir símbolos acima como uma árvore"
+msgstr "Imprimir símbolos pai como uma árvore"
 
-#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:167
-msgid "Find symbol at a specific position in a file"
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:168
+#| msgid "Find symbol at a specific position in a file"
+msgid "Find a symbol at a position in a file"
 msgstr "Encontrar símbolo numa posição específica num ficheiro"
+
+#: libfoundry/cli/foundry-cli-builtin-find-symbol-at.c:169
+msgid "FILE LINE LINE_OFFSET"
+msgstr "FICHEIRO LINHA DESLOCAMENTO_DA_LINHA"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:55
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:56
@@ -830,31 +1019,33 @@ msgstr "Palavras-chave a pesquisar"
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:127
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:132
 msgid "KEYWORDS"
-msgstr "KEYWORDS"
+msgstr "PALAVRAS-CHAVE"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-issues-list.c:134
-msgid "List issues found on forge"
-msgstr "Listar problemas encontrados no forge"
+#| msgid "List issues found on forge"
+msgid "List issues from the current forge"
+msgstr "Listar problemas encontrados no Forge atual"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-list.c:88
 msgid "List available forges"
-msgstr "Listar forges disponíveis"
+msgstr "Listar Forges disponíveis"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:129
 msgid "List only closed merge requests"
-msgstr "Listar apenas pedidos de submissão encerrados"
+msgstr "Listar apenas pedidos de integração encerrados"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:130
 msgid "List all merge requests (open and closed)"
-msgstr "Listar todas as solicitações de submisão (abertas e fechadas)"
+msgstr "Listar todos pedidos de integração (abertos e fechados)"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:131
 msgid "List only merged merge requests"
 msgstr "Listar apenas pedidos de integração submetidos"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-merge-requests-list.c:139
-msgid "List merge requests found on forge"
-msgstr "Listar solicitações de submissões encontradas no Forge"
+#| msgid "List merge requests found on forge"
+msgid "List merge requests from the current forge"
+msgstr "Listar pedidos de integração encontrados no Forge"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:50
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:53
@@ -871,24 +1062,31 @@ msgid "Avatar URL"
 msgstr "URL do avatar"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-project.c:104
-msgid "Get info on current forge project"
-msgstr "Obter informações sobre o projeto Forge atual"
+#| msgid "Get info on current forge project"
+msgid "Show the current forge project"
+msgstr "Apresentar o projeto Forge atual"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-switch.c:106
 msgid "Clear the forge setting"
 msgstr "Limpar a definição do Forge"
 
-#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:113
-msgid "FORGE - Switch forge to FORGE"
-msgstr "FORGE - Alternar o Forge para FORGE"
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:114
+#| msgid "Switch the current target device"
+msgid "Switch the current forge"
+msgstr "Alternar o Forge atual"
+
+#: libfoundry/cli/foundry-cli-builtin-forge-switch.c:115
+msgid "[FORGE]"
+msgstr "[FORGE]"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:54
 msgid "Bio"
 msgstr "Bio"
 
 #: libfoundry/cli/foundry-cli-builtin-forge-user.c:107
-msgid "Get info on current forge user"
-msgstr "Obter informações sobre o utilizador atual do Forge"
+#| msgid "Get info on current forge user"
+msgid "Show the current forge user"
+msgstr "Apresentar o utilizador atual do Forge"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:64
 msgid "Uri"
@@ -924,7 +1122,7 @@ msgstr "Pesquisa sem distinção entre maiúsculas e minúsculas"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:223
 msgid "Use regular expressions"
-msgstr "Usar expressões regulares"
+msgstr "Utilizar expressões regulares"
 
 #: libfoundry/cli/foundry-cli-builtin-grep.c:224
 msgid "Match whole words"
@@ -967,18 +1165,23 @@ msgstr "Substituir correspondências pelo texto fornecido"
 msgid "TEXT"
 msgstr "TEXTO"
 
-#: libfoundry/cli/foundry-cli-builtin-grep.c:236
+#: libfoundry/cli/foundry-cli-builtin-grep.c:237
 msgid "Search for text patterns in files"
 msgstr "Procurar padrões de texto em ficheiros"
 
-#: libfoundry/cli/foundry-cli-builtin-guess-language.c:113
-msgid "FILE - Guess a files language"
-msgstr "FICHEIRO - Adivinhar o idioma de um ficheiro"
+#: libfoundry/cli/foundry-cli-builtin-grep.c:238
+msgid "PATTERN [TARGET…]"
+msgstr "PADRÃO [ALVO…]"
+
+#: libfoundry/cli/foundry-cli-builtin-guess-language.c:114
+#| msgid "FILE - Guess a files language"
+msgid "Guess a file's language"
+msgstr "Adivinhar o idioma de um ficheiro"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:54
 #, c-format
 msgid "'%s' is already within a foundry project at '%s'"
-msgstr "'%s' já está dentro de um projeto Foundry em '%s'"
+msgstr "'%s' já se encontra dentro de um projeto Foundry em '%s'"
 
 #: libfoundry/cli/foundry-cli-builtin-init.c:67
 msgid "Failed to initialize foundry"
@@ -997,9 +1200,13 @@ msgstr "Falha ao encerrar o Foundry"
 msgid "Initialize a foundry project"
 msgstr "Inicializar um projeto Foundry"
 
-#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:118
-msgid "MODEL - Complete using a LLM"
-msgstr "MODELO - Complete usando um LLM"
+#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:119
+msgid "Complete a prompt using a language model"
+msgstr "Completar uma linha de comandos através de um modelo de linguagem"
+
+#: libfoundry/cli/foundry-cli-builtin-llm-complete.c:120
+msgid "MODEL PROMPT"
+msgstr "MODELO DE LINHA DE COMANDOS"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:50
 msgid "Digest"
@@ -1008,10 +1215,6 @@ msgstr "Resumo"
 #: libfoundry/cli/foundry-cli-builtin-llm-list-models.c:94
 msgid "List available language models"
 msgstr "Listar modelos de linguagem disponíveis"
-
-#: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:50
-msgid "URI"
-msgstr "URI"
 
 #: libfoundry/cli/foundry-cli-builtin-llm-list-resources.c:53
 msgid "Content Type"
@@ -1030,16 +1233,28 @@ msgid "Languages"
 msgstr "Idiomas"
 
 #: libfoundry/cli/foundry-cli-builtin-lsp-list.c:91
-msgid "List available lsps"
-msgstr "Listar lsps disponíveis"
+#| msgid "List available language server plugins"
+msgid "List available language servers"
+msgstr "Listar servidores de linguagem disponíveis"
 
-#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:131
+#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:132
+#| msgid "List available language server plugins"
+msgid "Prefer a language server plugin"
+msgstr "Preferir um plugin de servidor de linguagem"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-prefer.c:133
 msgid "PLUGIN LANGUAGE"
 msgstr "IDIOMA DO PLUGIN"
 
-#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:195
-msgid "LANGUAGE - Run a language server"
-msgstr "IDIOMA - Executar um servidor de linguagem"
+#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:196
+#| msgid "LANGUAGE - Run a language server"
+msgid "Run a language server"
+msgstr "Executar um servidor de linguagem"
+
+#: libfoundry/cli/foundry-cli-builtin-lsp-run.c:197
+#| msgid "PLUGIN LANGUAGE"
+msgid "LANGUAGE"
+msgstr "IDIOMA"
 
 #: libfoundry/cli/foundry-cli-builtin-mcp.c:61
 msgid "Failed to get stdin/stdout file descriptors"
@@ -1053,9 +1268,15 @@ msgstr "Falha ao criar o servidor MCP"
 msgid "Run MCP server"
 msgstr "Executar servidor MCP"
 
-#: libfoundry/cli/foundry-cli-builtin-mdoc.c:112
-msgid "KEYWORD - find gir doc in markdown"
-msgstr "PALAVRA-CHAVE - encontrar documentação GIR em Markdown"
+#: libfoundry/cli/foundry-cli-builtin-mdoc.c:113
+#| msgid "List documentation bundles"
+msgid "Find GIR documentation in Markdown"
+msgstr "Encontrar documentação GIR em Markdown"
+
+#: libfoundry/cli/foundry-cli-builtin-mdoc.c:114
+#| msgid "KEYWORDS"
+msgid "KEYWORD"
+msgstr "PALAVRAS-CHAVE"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:62
 msgid "Directory"
@@ -1063,18 +1284,12 @@ msgstr "Diretório"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:63
 msgid "Flags"
-msgstr "Sinalizações"
+msgstr "Parâmetros"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:116
-msgid "FILE - List command to compile file"
-msgstr "FICHEIRO - Lista os comandos para compilar o ficheiro"
-
-#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:218
-msgid ""
-"PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build pipeline"
-msgstr ""
-"PROJETO_DIRETÓRIO VINCULADO_FASE - Vincula um espaço de trabalho ao pipeline "
-"de compilação"
+#: libfoundry/cli/foundry-cli-builtin-pipeline-flags.c:117
+#| msgid "FILE - List command to compile file"
+msgid "Show the command used to compile a file"
+msgstr "Lista o comando utilizado para compilar um ficheiro"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:48
 msgid "Phase"
@@ -1085,42 +1300,168 @@ msgid "Completed"
 msgstr "Concluído"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-info.c:93
-msgid "List information about pipeline"
-msgstr "Listar informações sobre o pipeline"
+#| msgid "Show information about the pipeline"
+msgid "Show information about the build pipeline"
+msgstr "Apresentar informações sobre a pipeline de compilação"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-invalidate.c:73
 msgid "Invalidate the build pipeline"
-msgstr "Invalidar o pipeline de compilação"
+msgstr "Invalidar a pipeline de compilação"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:219
+#| msgid "Invalidate the build pipeline"
+msgid "Link a workspace to the build pipeline"
+msgstr "Vincular um espaço de trabalho à pipeline de compilação"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-link.c:220
+#| msgid ""
+#| "PHASE PROJECT_DIRECTORY LINKED_PHASE - Link a workspace to the build "
+#| "pipeline"
+msgid "PHASE PROJECT_DIRECTORY LINKED_PHASE"
+msgstr "FASE DIRETÓRIO_DO_PROJETO FASE_VINCULADA"
 
 #: libfoundry/cli/foundry-cli-builtin-pipeline-targets.c:97
 msgid "List known build targets"
 msgstr "Listar alvos de compilação conhecidos"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:241
-msgid "PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"
-msgstr ""
-"FASE PROJETO_DIRECTÓRIO - Desvincular um espaço de trabalho do pipeline de "
-"compilação"
+#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:242
+#| msgid "PHASE PROJECT_DIRECTORY - Unlink a workspace from the build pipeline"
+msgid "Unlink a workspace from the build pipeline"
+msgstr "Desvincular um espaço de trabalho da pipeline de compilação"
 
-#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:96
-msgid "PROGRAM - Look for PROGRAM in build pipeline"
-msgstr "PROGRAMA - Procure por PROGRAMA no pipeline de compilação"
+#: libfoundry/cli/foundry-cli-builtin-pipeline-unlink.c:243
+msgid "PHASE PROJECT_DIRECTORY"
+msgstr "FASE DIRETÓRIO_DO_PROJETO"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:97
+#| msgid "Invalidate the build pipeline"
+msgid "Find a program in the build pipeline"
+msgstr "Encontrar um programa na pipeline de compilação"
+
+#: libfoundry/cli/foundry-cli-builtin-pipeline-which.c:98
+msgid "PROGRAM"
+msgstr "PROGRAMA"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:135
+msgid "Set the path to the .foundry dir"
+msgstr "Defina o caminho para o .diretório foundry"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:137
+msgid "Use the shared user context"
+msgstr "Utilizar o contexto partilhado do utilizador"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:139
+msgid "Show version information"
+msgstr "Apresentar informação da versão"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:243
+#| msgid "Invalidate the build pipeline"
+msgid "Inspect and manage the build pipeline"
+msgstr "Inspecionar e gerir a pipeline de compilação"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:247
+#| msgid "List available tool integrations"
+msgid "List and run continuous integration jobs"
+msgstr "Listar e executar tarefas de integração contínua"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:251
+#| msgid "List available configurations"
+msgid "List and select build configurations"
+msgstr "Listar e selecionar configurações de compilação"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:255
+#| msgid "Build Project Dependencies"
+msgid "List and update project dependencies"
+msgstr "Listar e atualizar dependências do projeto"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:259
+#| msgid "List available devices"
+msgid "List and select target devices"
+msgstr "Listar e selecionar dispositivos de destino"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:263
+#| msgid "Install a specific SDK"
+msgid "List, install, and inspect SDKs"
+msgstr "Listar, instalar e inspecionar SDKs"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:267
+msgid "Manage stored service credentials"
+msgstr "Gerir credenciais de serviço armazenadas"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:271
+msgid "Read and update Foundry settings"
+msgstr "Ler e atualizar configurações do Foundry"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:275
+#| msgid "List available project templates"
+msgid "List and run project tests"
+msgstr "Listar e executar testes do projeto"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:280
+#| msgid "Search for documentation"
+msgid "Search and manage documentation"
+msgstr "Pesquisar e gerir documentação"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:284
+#| msgid "List available documentation bundles"
+msgid "List and install documentation bundles"
+msgstr "Listar e instalar pacotes de documentação"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:290
+msgid "Inspect and configure forge integrations"
+msgstr "Inspecionar e configurar integrações com o Forge"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:294
+msgid "Inspect forge issues"
+msgstr "Inspecionar problemas com o Forge"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:298
+#| msgid "List only merged merge requests"
+msgid "Inspect forge merge requests"
+msgstr "Inspecionar pedidos de integração do forge"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:304
+#| msgid "List available language models"
+msgid "Inspect and use language models"
+msgstr "Inspecionar e utilizar modelos de linguagem"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:310
+#| msgid "List available language server plugins"
+msgid "List, configure, and run language servers"
+msgstr "Listar, configurar e executar servidores de linguagem"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:316
+#| msgid "List available project templates"
+msgid "List and expand project templates"
+msgstr "Listar e expandir modelos de projeto"
+
+#: libfoundry/cli/foundry-cli-builtin-private.h:322
+msgid "Inspect and configure version control"
+msgstr "Inspecionar e configurar controlo de versões"
 
 #: libfoundry/cli/foundry-cli-builtin-run.c:89
 msgid "No default run command specified in configuration"
 msgstr "Nenhum comando de execução padrão especificado na configuração"
 
-#: libfoundry/cli/foundry-cli-builtin-run.c:136
-msgid "[-- COMMAND...] - Run the application"
-msgstr "[-- COMANDO...] - Executar a aplicação"
+#: libfoundry/cli/foundry-cli-builtin-run.c:137
+#| msgid "The application to run"
+msgid "Run the application"
+msgstr "Executar a aplicação"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-install.c:113
 msgid "Installing SDK"
 msgstr "A instalar o SDK"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:154
-msgid "SDK_ID - Install a SDK"
-msgstr "SDK_ID - Instalar um SDK"
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:155
+#| msgid "Installing SDK"
+msgid "Install an SDK"
+msgstr "Instalar um SDK"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-install.c:156
+#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:176
+#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:135
+msgid "SDK_ID"
+msgstr "ID_DO_SDK"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:61
 msgid "Arch"
@@ -1131,67 +1472,93 @@ msgid "Extension"
 msgstr "Extensão"
 
 #: libfoundry/cli/foundry-cli-builtin-sdk-list.c:114
-#: libfoundry/cli/foundry-command-line.c:269
 msgid "List available SDKs"
 msgstr "Listar SDKs disponíveis"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:174
-msgid "SDK - Start a shell in SDK"
-msgstr "SDK - Iniciar um shell no SDK"
+#: libfoundry/cli/foundry-cli-builtin-sdk-shell.c:175
+#| msgid "SDK - Start a shell in SDK"
+msgid "Start a shell in an SDK"
+msgstr "Iniciar shell num SDK"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:133
-msgid "SDK_ID - Switch current SDK"
-msgstr "SDK_ID - Alternar o SDK atual"
+#: libfoundry/cli/foundry-cli-builtin-sdk-switch.c:134
+#| msgid "SDK_ID - Switch current SDK"
+msgid "Switch the current SDK"
+msgstr "Alternar o SDK atual"
 
-#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:143
-msgid "SDK PROGRAM - Look for PROGRAM in SDK"
-msgstr "PROGRAMA SDK - Procure o PROGRAMA no SDK"
+#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:144
+msgid "Find a program in an SDK"
+msgstr "Encontrar um programa num SDK"
+
+#: libfoundry/cli/foundry-cli-builtin-sdk-which.c:145
+msgid "SDK_ID PROGRAM"
+msgstr "ID_DO_SDK PROGRAMA"
 
 #: libfoundry/cli/foundry-cli-builtin-search.c:115
 msgid "Query search providers"
-msgstr "Consulte provedores de pesquisa"
+msgstr "Consulte fornecedores de pesquisa"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:120
-msgid "HOSTNAME SERVICE - Check when API key expires"
-msgstr "HOSTNAME SERVICE - Verificar quando a chave da API expira"
+#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:121
+#| msgid "HOSTNAME SERVICE - Check when API key expires"
+msgid "Show when an API key expires"
+msgstr "Mostrar quando a chave de uma API expira"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:142
-msgid "HOSTNAME SERVICE - Retrieve API key for service"
-msgstr "HOSTNAME SERVICE - Recuperar a chave da API para o serviço"
+#: libfoundry/cli/foundry-cli-builtin-secret-check-expires-at.c:122
+#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:146
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:153
+msgid "HOSTNAME SERVICE"
+msgstr "HOSTNAME SERVIÇO"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+#: libfoundry/cli/foundry-cli-builtin-secret-get-api-key.c:145
+#| msgid "HOSTNAME SERVICE - Retrieve API key for service"
+msgid "Retrieve an API key for a service"
+msgstr "Recuperar a chave de uma API para o serviço"
+
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:143
 msgid "Set expiration date in YYYY-MM-DD format"
-msgstr "Definir data de expiração no formato DD-MM-YYYY"
+msgstr "Definir data de expiração no formato YYYY-MM-DD"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:141
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:143
 msgid "DATE"
 msgstr "DATA"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:149
-msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
-msgstr "[OPÇÕES] SERVIÇO HOSTNAME - Rodar chave de API para o serviço"
+#: libfoundry/cli/foundry-cli-builtin-secret-rotate.c:152
+#| msgid "[OPTIONS] HOSTNAME SERVICE - Rotate API key for service"
+msgid "Rotate an API key for a service"
+msgstr "Rodar a chave uma API para um serviço"
 
-#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:143
-msgid "HOSTNAME SERVICE API_KEY - Store API key for service"
-msgstr "HOSTNAME SERVICE API_KEY - Armazenar chave de API para o serviço"
+#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:179
+#| msgid "HOSTNAME SERVICE - Retrieve API key for service"
+msgid "Store an API key for a service"
+msgstr "Armazenar a chave de uma API para um serviço"
 
-#: libfoundry/cli/foundry-cli-builtin-settings-get.c:241
-msgid "SCHEMA KEY - Get setting"
-msgstr "SCHEMA KEY - Obter definição"
+#: libfoundry/cli/foundry-cli-builtin-secret-set-api-key.c:180
+#| msgid "HOSTNAME SERVICE API_KEY - Store API key for service"
+msgid "HOSTNAME SERVICE [API_KEY]"
+msgstr "HOSTNAME SERVIÇO [API_KEY]"
 
-#: libfoundry/cli/foundry-cli-builtin-settings-set.c:282
-msgid "SCHEMA KEY - Set setting"
-msgstr "SCHEMA KEY - Definir definição"
+#: libfoundry/cli/foundry-cli-builtin-settings-get.c:242
+#| msgid "Clear the forge setting"
+msgid "Get a setting"
+msgstr "Obter uma configuração"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-get.c:243
+msgid "SCHEMA KEY"
+msgstr "ESQUEMA CHAVE"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-set.c:283
+#| msgid "Clear the forge setting"
+msgid "Set a setting"
+msgstr "Definir uma configuração"
+
+#: libfoundry/cli/foundry-cli-builtin-settings-set.c:284
+msgid "SCHEMA KEY VALUE"
+msgstr "ESQUEMA CHAVE VALOR"
 
 #: libfoundry/cli/foundry-cli-builtin-shell.c:150
 msgid "Enter environment for running applications"
 msgstr "Inserir ambiente para executar aplicações"
 
-#: libfoundry/cli/foundry-cli-builtin-shell.c:157
-msgid "- Start shell in build environment"
-msgstr "- Iniciar shell no ambiente de compilação"
-
-#: libfoundry/cli/foundry-cli-builtin-show.c:109
+#: libfoundry/cli/foundry-cli-builtin-show.c:110
 msgid "Reveal a file in the file manager"
 msgstr "Exibir um ficheiro no gestor de ficheiros"
 
@@ -1203,17 +1570,23 @@ msgstr "Nenhum símbolo encontrado"
 msgid "Print object type names next to symbol names"
 msgstr "Imprimir nomes de tipos de objeto ao lado dos nomes dos símbolos"
 
-#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:189
+#: libfoundry/cli/foundry-cli-builtin-symbol-tree.c:190
 msgid "List symbols in a file as a tree"
-msgstr "Listar símbolos em um ficheiro como uma árvore"
+msgstr "Listar símbolos num ficheiro como uma árvore"
 
-#: libfoundry/cli/foundry-cli-builtin-template-create.c:160
-msgid "TEMPLATE_ID|TEMPLATE_FILE - Expand a template"
-msgstr "TEMPLATE_ID|TEMPLATE_FILE - Expandir um modelo"
+#: libfoundry/cli/foundry-cli-builtin-template-create.c:161
+#| msgid "List available project templates"
+msgid "Expand a project template"
+msgstr "Expandir um modelo de projeto"
+
+#: libfoundry/cli/foundry-cli-builtin-template-create.c:162
+#| msgid "TEMPLATE_ID|TEMPLATE_FILE - Expand a template"
+msgid "TEMPLATE_ID|TEMPLATE_FILE"
+msgstr "TEMPLATE_ID|TEMPLATE_FILE"
 
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:51
 msgid "Tags"
-msgstr "Tags"
+msgstr "Etiquetas"
 
 #: libfoundry/cli/foundry-cli-builtin-template-list.c:96
 msgid "List available project templates"
@@ -1227,21 +1600,30 @@ msgstr "Pacotes"
 msgid "List available tests"
 msgstr "Listar testes disponíveis"
 
-#: libfoundry/cli/foundry-cli-builtin-test-run.c:127
-msgid "TEST - Run a test"
-msgstr "TEST - Executar um teste"
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:128
+#| msgid "Run a project command"
+msgid "Run a project test"
+msgstr "Executar um teste do projeto"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:165
-msgid "FILE - Print commit blame information"
-msgstr "FILE - Imprimir informações de atribuição de commit"
+#: libfoundry/cli/foundry-cli-builtin-test-run.c:129
+msgid "TEST_NAME"
+msgstr "NOME_DO_TESTE"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:153
-msgid "FILE - Print commit fetch information"
-msgstr "FILE - Imprimir informações de busca de commit"
+#: libfoundry/cli/foundry-cli-builtin-vcs-blame.c:166
+msgid "Show commit attribution for a file"
+msgstr "Mostrar a atribuição de um commit a um arquivo"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:111
-msgid "FILE - Check if FILE is ignored"
-msgstr "FILE - Verificar se o ficheiro FILE foi ignorado"
+#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:154
+msgid "Fetch changes from a remote"
+msgstr "Procurar alterações de um remote"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-fetch.c:155
+msgid "REMOTE"
+msgstr "REMOTE"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-ignored.c:112
+msgid "Check whether a file is ignored"
+msgstr "Verificar se o ficheiro é ignorado"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:53
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:53
@@ -1249,10 +1631,22 @@ msgid "Local"
 msgstr "Local"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-branches.c:101
+#| msgid "List remotes known to the VCS"
+msgid "List branches known to the VCS"
+msgstr "Listar ramificações conhecidas pelo VCS"
+
 #: libfoundry/cli/foundry-cli-builtin-vcs-list-files.c:116
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
 msgid "List files known to the VCS"
 msgstr "Listar ficheiros conhecidos pelo VCS"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
+msgid "List remotes known to the VCS"
+msgstr "Listar repositórios remotos conhecidos pelo VCS"
+
+#: libfoundry/cli/foundry-cli-builtin-vcs-list-tags.c:101
+#| msgid "List remotes known to the VCS"
+msgid "List tags known to the VCS"
+msgstr "Listar etiquetas conhecidas pelo VCS"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:50
 msgid "Branch Name"
@@ -1260,220 +1654,74 @@ msgstr "Nome da ramificação"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-list.c:94
 msgid "List available version control systems"
-msgstr "Listar versões disponíveis sistemas de controle"
+msgstr "Listar sistemas de controlo de versões disponíveis"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-list-remotes.c:99
-msgid "List remotes known to the VCS"
-msgstr "Listar repositórios remotos conhecidos pelo VCS"
-
-#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:124
-msgid "Get history for a file"
-msgstr "Obter histórico de um ficheiro"
+#: libfoundry/cli/foundry-cli-builtin-vcs-log.c:125
+#| msgid "Get history for a file"
+msgid "Show history for a file"
+msgstr "Apresentar histórico de um ficheiro"
 
 #: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:133
 msgid "Set VCS as default for all project contributors"
 msgstr "Definir VCS como padrão para todos os contribuidores do projeto"
 
-#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:140
-msgid "VCS - Switch current version control system"
-msgstr "VCS - Alternar o sistema de controle de versão atual"
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:141
+#| msgid "VCS - Switch current version control system"
+msgid "Switch the current version control system"
+msgstr "Alterar o sistema de controlo de versões atual"
 
-#: libfoundry/cli/foundry-cli-command.c:558
-msgid "Usage"
-msgstr "Utilização"
+#: libfoundry/cli/foundry-cli-builtin-vcs-switch.c:142
+msgid "VCS_ID"
+msgstr "ID_DO_VCS"
 
-#: libfoundry/cli/foundry-cli-command.c:558
-msgid "OPTIONS"
-msgstr "OPÇÕES"
+#: libfoundry/cli/foundry-cli-command-tree.c:740
+msgid "VALUE"
+msgstr "VALOR"
 
-#: libfoundry/cli/foundry-cli-command-tree.c:590
+#: libfoundry/cli/foundry-cli-command-tree.c:782
+#| msgid "Actions"
+msgid "Options"
+msgstr "Opções"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:835
+msgid "Commands"
+msgstr "Comandos"
+
+#: libfoundry/cli/foundry-cli-command-tree.c:889
+#: libfoundry/cli/foundry-cli-command-tree.c:992
 #, c-format
 msgid "No such command"
 msgstr "Comando inexistente"
 
-#: libfoundry/cli/foundry-command-line.c:84
-msgid "Set the path to the .foundry dir"
-msgstr "Defina o caminho para o .diretório foundry"
+#: libfoundry/cli/foundry-cli-command-tree.c:903
+#, c-format
+msgid "Unknown option %s for “%s”"
+msgstr "Opção desconhecida %s para “%s”"
 
-#: libfoundry/cli/foundry-command-line.c:219
-msgid "Usage:"
-msgstr "Utilização:"
+#: libfoundry/cli/foundry-cli-command-tree.c:910
+#, c-format
+msgid "Unknown command “%s” for “%s”"
+msgstr "Comando desconhecido “%s” para “%s”"
 
-#: libfoundry/cli/foundry-command-line.c:222
-msgid "Commands"
-msgstr "Comandos"
+#: libfoundry/cli/foundry-cli-command-tree.c:918
+#: libfoundry/cli/foundry-cli-command.c:588
+msgid "Usage"
+msgstr "Utilização"
 
-#: libfoundry/cli/foundry-command-line.c:223
-msgid "Initialize a new project in current directory"
-msgstr "Inicializar um novo projeto no diretório atual"
+#: libfoundry/cli/foundry-cli-command-tree.c:921
+#: libfoundry/cli/foundry-cli-command.c:588
+msgid "OPTIONS"
+msgstr "OPÇÕES"
 
-#: libfoundry/cli/foundry-command-line.c:226
-msgid "Environment Commands"
-msgstr "Comandos de ambiente"
+#: libfoundry/cli/foundry-cli-command-tree.c:924
+msgid "COMMAND"
+msgstr "COMANDO"
 
-#: libfoundry/cli/foundry-command-line.c:227
-msgid "Enter environment of project in current directory"
-msgstr "Entrar no ambiente do projeto no diretório atual"
-
-#: libfoundry/cli/foundry-command-line.c:228
-msgid "Enter build environment for project"
-msgstr "Entrar no ambiente de compilação do projeto"
-
-#: libfoundry/cli/foundry-command-line.c:230
-msgid "Build Commands"
-msgstr "Comandos de compilação"
-
-#: libfoundry/cli/foundry-command-line.c:231
-msgid "Build the current build pipeline"
-msgstr "Compilar o pipeline de compilação atual"
-
-#: libfoundry/cli/foundry-command-line.c:232
-msgid "Wipe and rebuild the current build pipeline"
-msgstr "Limpar e recompilar o pipeline de compilação atual"
-
-#: libfoundry/cli/foundry-command-line.c:233
-msgid "Clean the current build pipeline"
-msgstr "Limpar o pipeline de compilação atual"
-
-#: libfoundry/cli/foundry-command-line.c:234
-msgid "Run the install target for the project"
-msgstr "Executar o alvo de instalação para o projeto"
-
-#: libfoundry/cli/foundry-command-line.c:235
-msgid "Deploy the project to the active device"
-msgstr "Implantar o projeto no dispositivo ativo"
-
-#: libfoundry/cli/foundry-command-line.c:236
-msgid "Export project artifacts"
-msgstr "Exportar artefatos do projeto"
-
-#: libfoundry/cli/foundry-command-line.c:238
-msgid "Run Commands"
-msgstr "Executar comandos"
-
-#: libfoundry/cli/foundry-command-line.c:239
-msgid "Run a project command"
-msgstr "Executar um comando do projeto"
-
-#. foundry_command_line_print (self, "%s:\n", _("User Commands"));
-#. foundry_command_line_print (self, "  command list         %s\n", _("List registered commands"));
-#. foundry_command_line_print (self, "  command add          %s\n", _("Add a new user command or group"));
-#. foundry_command_line_print (self, "  command remove       %s\n", _("Remove a user command or group"));
-#. foundry_command_line_print (self, "\n");
-#: libfoundry/cli/foundry-command-line.c:250
-msgid "File/Directory Commands"
-msgstr "Comandos de ficheiro/diretório"
-
-#. foundry_command_line_print (self, "  search               %s\n", _("Search the project"));
-#. foundry_command_line_print (self, "  replace              %s\n", _("Search and replace within the project"));
-#. foundry_command_line_print (self, "  index                %s\n", _("Update source code indexes"));
-#. foundry_command_line_print (self, "  format               %s\n", _("Reformat a file"));
-#. foundry_command_line_print (self, "  symbols              %s\n", _("List symbols within a file"));
-#: libfoundry/cli/foundry-command-line.c:256
-msgid "List diagnostics within a file or files"
-msgstr "Listar diagnósticos em um ou mais ficheiros"
-
-#: libfoundry/cli/foundry-command-line.c:257
-msgid "Open a file or files in file browser"
-msgstr "Abrir um ou mais ficheiros no navegador de ficheiros"
-
-#: libfoundry/cli/foundry-command-line.c:259
-msgid "Documentation Commands"
-msgstr "Comandos de documentação"
-
-#: libfoundry/cli/foundry-command-line.c:260
-msgid "List available documentation bundles"
-msgstr "Listar pacotes de documentação disponíveis"
-
-#: libfoundry/cli/foundry-command-line.c:261
-msgid "Install a specific documentation bundle"
-msgstr "Instalar um pacote de documentação específico"
-
-#: libfoundry/cli/foundry-command-line.c:262
-msgid "Search for documentation"
-msgstr "Pesquisar documentação"
-
-#: libfoundry/cli/foundry-command-line.c:264
-msgid "Configuration Commands"
-msgstr "Comandos de configuração"
-
-#: libfoundry/cli/foundry-command-line.c:265
-msgid "List available configurations"
-msgstr "Listar configurações disponíveis"
-
-#: libfoundry/cli/foundry-command-line.c:266
-msgid "Change the active configuration"
-msgstr "Alterar a configuração ativa"
-
-#: libfoundry/cli/foundry-command-line.c:268
-msgid "SDK Commands"
-msgstr "Comandos do SDK"
-
-#: libfoundry/cli/foundry-command-line.c:270
-msgid "Install a specific SDK"
-msgstr "Instalar um SDK específico"
-
-#: libfoundry/cli/foundry-command-line.c:271
-msgid "Change the active SDK for the build pipeline"
-msgstr "Alterar o SDK ativo para o pipeline de compilação"
-
-#: libfoundry/cli/foundry-command-line.c:273
-msgid "Pipeline Commands"
-msgstr "Comandos do Pipeline"
-
-#: libfoundry/cli/foundry-command-line.c:274
-msgid "Show information about the pipeline"
-msgstr "Exibir informações sobre o pipeline"
-
-#: libfoundry/cli/foundry-command-line.c:275
-msgid "Build the current pipeline"
-msgstr "Compilar o pipeline atual"
-
-#: libfoundry/cli/foundry-command-line.c:276
-msgid "Rebuild the current pipeline"
-msgstr "Recompilar o pipeline atual"
-
-#: libfoundry/cli/foundry-command-line.c:277
-msgid "Clean the current pipeline"
-msgstr "Limpar o pipeline atual"
-
-#: libfoundry/cli/foundry-command-line.c:278
-msgid "Delete contents related to build"
-msgstr "Excluir conteúdo relacionado à compilação"
-
-#: libfoundry/cli/foundry-command-line.c:279
-msgid "Run pipeline through configure phase"
-msgstr "Executar o pipeline pela fase de configuração"
-
-#: libfoundry/cli/foundry-command-line.c:282
-msgid "Device Commands"
-msgstr "Comandos do dispositivo"
-
-#: libfoundry/cli/foundry-command-line.c:284
-msgid "Switch the current target device"
-msgstr "Alternar o dispositivo de destino atual"
-
-#: libfoundry/cli/foundry-command-line.c:288
-msgid "LSP Commands"
-msgstr "Comandos LSP"
-
-#: libfoundry/cli/foundry-command-line.c:289
-msgid "List available language server plugins"
-msgstr "Listar plugins de servidor de linguagem disponíveis"
-
-#: libfoundry/cli/foundry-command-line.c:290
-msgid "Run a language server for specific language"
-msgstr "Listar plugins de servidor de linguagem disponíveis"
-
-#: libfoundry/cli/foundry-command-line.c:291
-msgid "Set preferred LSP for language"
-msgstr "Definir LSP preferencial para o idioma"
-
-#: libfoundry/cli/foundry-command-line.c:567
+#: libfoundry/cli/foundry-command-line.c:554
 msgid "Yes"
 msgstr "Sim"
 
-#: libfoundry/cli/foundry-command-line.c:569
+#: libfoundry/cli/foundry-command-line.c:556
 msgid "No"
 msgstr "Não"
 
@@ -1483,18 +1731,18 @@ msgid "My Computer"
 msgstr "O Meu Computador"
 
 #. translators: %s is replaced with project title
-#: libfoundry/foundry-context.c:1009
+#: libfoundry/foundry-context.c:1081
 #, c-format
 msgid "Project “%s” loaded"
 msgstr "Projeto “%s” carregado"
 
 #: libfoundry/foundry-util.c:636
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:42
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:93
 msgid "Projects"
 msgstr "Projetos"
 
-#: libfoundry/foundry-util.c:1389
+#: libfoundry/foundry-util.c:1395
 msgid "Building project"
 msgstr "A compilar projeto"
 
@@ -1516,31 +1764,21 @@ msgstr "Credenciais"
 msgid "Received %u/%u objects (%s bytes)"
 msgstr "Objetos %u/%u recebidos (%s bytes)"
 
-#: libfoundry/git/foundry-git-cloner.c:322
+#: libfoundry/git/foundry-git-cloner.c:326
 msgid "Invalid branch name"
-msgstr "Nome de branch inválido"
+msgstr "Nome da ramificação inválido"
 
-#: libfoundry/git/foundry-git-cloner.c:328
+#: libfoundry/git/foundry-git-cloner.c:332
 msgid "Directory must be set"
 msgstr "O diretório deve ser definido"
 
-#: libfoundry/git/foundry-git-cloner.c:333
+#: libfoundry/git/foundry-git-cloner.c:337
 msgid "Directory already exists"
 msgstr "O diretório já existe"
 
-#: libfoundry/git/foundry-git-vcs.c:75
+#: libfoundry/git/foundry-git-vcs.c:78
 msgid "Git"
 msgstr "Git"
-
-#: libfoundry-gtk/markup/foundry-markup-view.c:460
-msgid "Cannot load HTML. Missing WebKit support."
-msgstr "Não foi possível carregar o HTML. Suporte WebKit ausente."
-
-#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:256
-#: libfoundry-gtk/shortcuts/foundry-shortcut-info.c:282
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:90
-msgid "Other"
-msgstr "Outro"
 
 #: libfoundry/licenses/foundry-license.c:260
 msgid "No License"
@@ -1576,12 +1814,12 @@ msgstr "Servidor LSP “%s” iniciado como processo %s"
 
 #: libfoundry/run/foundry-run-tool.c:253
 msgid "Forcing exit of tool"
-msgstr "Forçando o encerramento da ferramenta"
+msgstr "A forçar o encerramento da ferramenta"
 
 #: libfoundry/run/foundry-run-tool.c:277
 #, c-format
 msgid "Sending signal %d to tool"
-msgstr "Enviando sinal %d para a ferramenta"
+msgstr "A enviar sinal %d para a ferramenta"
 
 #: libfoundry/search/foundry-menu-search-provider.c:40
 msgid "Menu Actions"
@@ -1593,7 +1831,7 @@ msgstr "Licença"
 
 #: libfoundry/vcs/foundry-no-vcs.c:49
 msgid "No Version Control"
-msgstr "Sem controlo de versão"
+msgstr "Sem controlo de versões"
 
 #: plugins/cmake/plugin-cmake-build-addin.c:152
 msgid "Configure CMake Project"
@@ -1615,6 +1853,10 @@ msgstr "Preparar ambiente de compilação"
 #, c-format
 msgid "Possible typo in “%s”. Did you mean “%s”?"
 msgstr "Possível erro ortográfico em “%s”. Queria dizer “%s”?"
+
+#: plugins/codex-acp/plugin-codex-acp-agent.c:481
+msgid "Codex"
+msgstr "Codex"
 
 #: plugins/devhelp/plugin-devhelp-book.c:522
 #: plugins/devhelp/plugin-devhelp-heading.c:611
@@ -1655,7 +1897,7 @@ msgstr "Um PTY para proxy bidirecional para o dispositivo"
 
 #: plugins/deviced/foundry-deviced.c:56
 msgid "Number of seconds to wait for the deviced peer to appear"
-msgstr "Número de segundos para aguardar o dispositivo par a aparecer"
+msgstr "Quantidade de segundos a aguardar até que o dispositivo par apareça"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-autogen-stage.c:97
 msgid "Running flatpak build-init"
@@ -1671,7 +1913,7 @@ msgstr "Inicializar a partir do Manifesto do Flatpak"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-bundle-stage.c:271
 msgid "Create Flatpak Bundle"
-msgstr "Criar pacote flatpak"
+msgstr "Criar pacote Flatpak"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-commit-stage.c:234
 msgid "Apply Finishing Details"
@@ -1699,11 +1941,11 @@ msgstr "Documentação do GNOME %s SDK"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-download-stage.c:273
 msgid "Download Flatpak Dependencies"
-msgstr "Descarregar dependências do flatpak"
+msgstr "Transferir dependências do Flatpak"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-export-stage.c:257
 msgid "Export to Flatpak Repository"
-msgstr "Exportar para o repositório flatpak"
+msgstr "Exportar para o repositório Flatpak"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-post-install-stage.c:225
 msgid "Post-Install Commands"
@@ -1711,13 +1953,13 @@ msgstr "Comandos de pós-instalação"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-prepare-stage.c:72
 msgid "Creating Flatpak staging directories"
-msgstr "Criando diretórios de staging do flatpak"
+msgstr "A criar diretórios de staging do Flatpak"
 
 #: plugins/fallbacks/flatpak/plugin-flatpak-prepare-stage.c:193
 msgid "Prepare Staging Directories"
-msgstr "Preparar diretórios staging"
+msgstr "Preparar diretórios de staging"
 
-#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:145
+#: plugins/fallbacks/flatpak/plugin-flatpak-sdk-install.c:158
 msgid "Installing"
 msgstr "A instalar"
 
@@ -1742,8 +1984,8 @@ msgid ""
 "Installs the application before running. This is necessary for most projects "
 "unless custom run commands are used."
 msgstr ""
-"Instala a aplicação antes de executar. Isso é necessário para a maioria dos "
-"projetos a menos que comandos de execução personalizados sejam usados."
+"Instala a aplicação antes de executar. Isto é necessário para a maioria dos "
+"projetos a menos que sejam utilizados comandos de execução personalizados."
 
 #: plugins/fallbacks/internal-tweaks/plugin-internal-tweak-provider.c:85
 msgid "Stop Signal"
@@ -1778,38 +2020,46 @@ msgid "Plugins"
 msgstr "Plugins"
 
 #: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:54
+msgid "Agents"
+msgstr "Agentes"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:57
+msgid "Continuous Integration"
+msgstr "Integração contínua"
+
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:60
 msgid "Diagnostics"
 msgstr "Diagnósticos"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:57
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:63
 msgid "Language Servers"
 msgstr "Servidores de linguagem"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:60
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:66
 msgid "Search"
 msgstr "Pesquisar"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:63
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:69
 msgid "Build Systems"
 msgstr "Sistemas de compilação"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:66
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:72
 msgid "SDKs"
 msgstr "SDKs"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:69
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:75
 msgid "Templates"
 msgstr "Modelos"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:75
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:81
 msgid "Language Models"
 msgstr "Modelos de linguagem"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:78
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:84
 msgid "Version Control"
-msgstr "Controlo de versão"
+msgstr "Controlo de versões"
 
-#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:81
+#: plugins/fallbacks/plugin-tweaks/plugin-tweak-provider.c:87
 msgid "Devices"
 msgstr "Dispositivos"
 
@@ -1854,12 +2104,155 @@ msgstr "Emulação riscv64"
 msgid "x64_64 Emulation"
 msgstr "Emulação x64_64"
 
-#. translators: first %s is replaced with hostname, second %s with the CPU architecture
+#. translators: %s is replaced with hostname
 #: plugins/qemu/plugin-qemu-device-provider.c:136
 #, c-format
 msgid "My Computer (%s)"
-msgstr "Meu Computador (%s)"
+msgstr "O Meu Computador (%s)"
 
 #: plugins/sarif/plugin-sarif-build-addin.c:106
 msgid "Clear existing diagnostics"
 msgstr "Limpar diagnósticos existentes"
+
+#~ msgid "List available configs"
+#~ msgstr "Listar configurações disponíveis"
+
+#~ msgid "CONFIG - Switch current config"
+#~ msgstr "CONFIG - Alternar configuração atual"
+
+#~ msgid "[-- COMMAND] - Start shell in build environment"
+#~ msgstr "[-- COMMAND] - Iniciar shell no ambiente de compilação"
+
+#~ msgid "DEVICE - Switch current device"
+#~ msgstr "DISPOSITIVO - Alternar dispositivo atual"
+
+#~ msgid "FILE [FILE...] - Diagnose a file"
+#~ msgstr "FICHEIRO [FICHEIRO...] - Diagnosticar um ficheiro"
+
+#~ msgid "FORGE - Switch forge to FORGE"
+#~ msgstr "FORGE - Alternar o Forge para FORGE"
+
+#~ msgid "MODEL - Complete using a LLM"
+#~ msgstr "MODELO - Complete usando um LLM"
+
+#~ msgid "List available lsps"
+#~ msgstr "Listar lsps disponíveis"
+
+#~ msgid "KEYWORD - find gir doc in markdown"
+#~ msgstr "PALAVRA-CHAVE - encontrar documentação GIR em Markdown"
+
+#~ msgid "List information about pipeline"
+#~ msgstr "Listar informações sobre o pipeline"
+
+#~ msgid "PROGRAM - Look for PROGRAM in build pipeline"
+#~ msgstr "PROGRAMA - Procure por PROGRAMA no pipeline de compilação"
+
+#~ msgid "[-- COMMAND...] - Run the application"
+#~ msgstr "[-- COMANDO...] - Executar a aplicação"
+
+#~ msgid "SDK_ID - Install a SDK"
+#~ msgstr "SDK_ID - Instalar um SDK"
+
+#~ msgid "SDK PROGRAM - Look for PROGRAM in SDK"
+#~ msgstr "PROGRAMA SDK - Procure o PROGRAMA no SDK"
+
+#~ msgid "SCHEMA KEY - Get setting"
+#~ msgstr "SCHEMA KEY - Obter definição"
+
+#~ msgid "SCHEMA KEY - Set setting"
+#~ msgstr "SCHEMA KEY - Definir definição"
+
+#~ msgid "TEST - Run a test"
+#~ msgstr "TEST - Executar um teste"
+
+#~ msgid "FILE - Print commit blame information"
+#~ msgstr "FILE - Imprimir informações de atribuição de commit"
+
+#~ msgid "FILE - Print commit fetch information"
+#~ msgstr "FILE - Imprimir informações de busca de commit"
+
+#~ msgid "FILE - Check if FILE is ignored"
+#~ msgstr "FILE - Verificar se o ficheiro FILE foi ignorado"
+
+#~ msgid "Usage:"
+#~ msgstr "Utilização:"
+
+#~ msgid "Initialize a new project in current directory"
+#~ msgstr "Inicializar um novo projeto no diretório atual"
+
+#~ msgid "Environment Commands"
+#~ msgstr "Comandos de ambiente"
+
+#~ msgid "Enter environment of project in current directory"
+#~ msgstr "Entrar no ambiente do projeto no diretório atual"
+
+#~ msgid "Enter build environment for project"
+#~ msgstr "Entrar no ambiente de compilação do projeto"
+
+#~ msgid "Build Commands"
+#~ msgstr "Comandos de compilação"
+
+#~ msgid "Build the current build pipeline"
+#~ msgstr "Compilar o pipeline de compilação atual"
+
+#~ msgid "Wipe and rebuild the current build pipeline"
+#~ msgstr "Limpar e recompilar o pipeline de compilação atual"
+
+#~ msgid "Clean the current build pipeline"
+#~ msgstr "Limpar o pipeline de compilação atual"
+
+#~ msgid "Run the install target for the project"
+#~ msgstr "Executar o alvo de instalação para o projeto"
+
+#~ msgid "Deploy the project to the active device"
+#~ msgstr "Implantar o projeto no dispositivo ativo"
+
+#~ msgid "File/Directory Commands"
+#~ msgstr "Comandos de ficheiro/diretório"
+
+#~ msgid "List diagnostics within a file or files"
+#~ msgstr "Listar diagnósticos em um ou mais ficheiros"
+
+#~ msgid "Open a file or files in file browser"
+#~ msgstr "Abrir um ou mais ficheiros no navegador de ficheiros"
+
+#~ msgid "Documentation Commands"
+#~ msgstr "Comandos de documentação"
+
+#~ msgid "Install a specific documentation bundle"
+#~ msgstr "Instalar um pacote de documentação específico"
+
+#~ msgid "Configuration Commands"
+#~ msgstr "Comandos de configuração"
+
+#~ msgid "SDK Commands"
+#~ msgstr "Comandos do SDK"
+
+#~ msgid "Change the active SDK for the build pipeline"
+#~ msgstr "Alterar o SDK ativo para o pipeline de compilação"
+
+#~ msgid "Pipeline Commands"
+#~ msgstr "Comandos do Pipeline"
+
+#~ msgid "Clean the current pipeline"
+#~ msgstr "Limpar o pipeline atual"
+
+#~ msgid "Delete contents related to build"
+#~ msgstr "Excluir conteúdo relacionado à compilação"
+
+#~ msgid "Run pipeline through configure phase"
+#~ msgstr "Executar o pipeline pela fase de configuração"
+
+#~ msgid "Device Commands"
+#~ msgstr "Comandos do dispositivo"
+
+#~ msgid "LSP Commands"
+#~ msgstr "Comandos LSP"
+
+#~ msgid "Run a language server for specific language"
+#~ msgstr "Listar plugins de servidor de linguagem disponíveis"
+
+#~ msgid "Set preferred LSP for language"
+#~ msgstr "Definir LSP preferencial para o idioma"
+
+
