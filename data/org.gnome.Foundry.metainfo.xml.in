@@ -14,7 +14,7 @@
 
   <url type="homepage">https://gitlab.gnome.org/GNOME/foundry</url>
   <url type="vcs-browser">https://gitlab.gnome.org/GNOME/foundry</url>
-  <url type="bugtracker">https://gitlab.gnome.org/GNOME/foundry/issues</url>
+  <url type="bugtracker">https://gitlab.gnome.org/GNOME/foundry/-/work_items</url>
   <url type="translate">https://l10n.gnome.org</url>
   <url type="donation">https://donate.gnome.org</url>
 
