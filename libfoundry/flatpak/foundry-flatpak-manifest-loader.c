@@ -216,12 +216,19 @@ _foundry_flatpak_manifest_load_file_as_json (GFile *file)
     }
   else
     {
-      g_autoptr(JsonParser) parser = json_parser_new_immutable ();
+      g_autoptr(JsonParser) parser = json_parser_new ();
 
       if (!dex_await (foundry_json_parser_load_from_file (parser, file), &error))
         return dex_future_new_for_error (g_steal_pointer (&error));
 
       root = json_node_ref (json_parser_get_root (parser));
+
+      /*
+       * JSON-GLib does not seal the synthetic array it creates for multiple
+       * top-level values, causing json_parser_get_root() to assert when an
+       * immutable parser is used. Seal the completed tree ourselves instead.
+       */
+      json_node_seal (root);
     }
 
   return dex_future_new_take_boxed (JSON_TYPE_NODE, g_steal_pointer (&root));

@@ -486,12 +486,15 @@ _foundry_flatpak_serializable_deserialize (FoundryFlatpakSerializable *self,
                                       "Failed to load \"%s\"",
                                       path);
 
-      parser = json_parser_new_immutable ();
+      parser = json_parser_new ();
 
       if (!dex_await (foundry_json_parser_load_from_file (parser, file), &error))
         return dex_future_new_for_error (g_steal_pointer (&error));
 
       node = loaded = json_node_ref (json_parser_get_root (parser));
+
+      /* See the JSON-GLib immutable parser workaround in the manifest loader. */
+      json_node_seal (loaded);
     }
 
   return dex_future_then (FOUNDRY_FLATPAK_SERIALIZABLE_GET_CLASS (self)->deserialize (self, node),

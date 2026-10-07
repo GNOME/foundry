@@ -22,7 +22,33 @@
 
 #include <foundry.h>
 
+#include "foundry-flatpak-manifest-loader-private.h"
+
 #include "test-util.h"
+
+static void
+test_builder_manifest_multiple_roots_fiber (void)
+{
+  g_autoptr(GFile) srcdir = g_file_new_for_path (g_getenv ("G_TEST_SRCDIR"));
+  g_autoptr(GFile) dir = g_file_get_child (srcdir, "test-manifests");
+  g_autoptr(GFile) file = NULL;
+  g_autoptr(JsonNode) root = NULL;
+  g_autoptr(GError) error = NULL;
+
+  file = g_file_get_child (dir,
+                           "multiple-roots-failure/org.gnome.Foundry.Test.json");
+  root = dex_await_boxed (_foundry_flatpak_manifest_load_file_as_json (file), &error);
+
+  g_assert_no_error (error);
+  g_assert_true (JSON_NODE_HOLDS_ARRAY (root));
+  g_assert_true (json_node_is_immutable (root));
+}
+
+static void
+test_builder_manifest_multiple_roots (void)
+{
+  test_from_fiber (test_builder_manifest_multiple_roots_fiber);
+}
 
 static void
 test_builder_manifest_fiber (void)
@@ -38,6 +64,7 @@ test_builder_manifest_fiber (void)
     { "gnome-builder/org.gnome.Builder.Devel.json" },
     { "simple/org.gnome.Foundry.Test.yaml" },
     { "jump-out-of-root-failure/org.gnome.foundry.testsuite.escape.json", G_IO_ERROR, G_IO_ERROR_NOT_FOUND },
+    { "multiple-roots-failure/org.gnome.Foundry.Test.json", G_IO_ERROR, G_IO_ERROR_INVALID_DATA },
   };
 
   for (guint i = 0; i < G_N_ELEMENTS (files); i++)
@@ -76,5 +103,7 @@ main (int argc,
   dex_init ();
   g_test_init (&argc, &argv, NULL);
   g_test_add_func ("/Foundry/Plugins/Flatpak/Builder/Manifest", test_builder_manifest);
+  g_test_add_func ("/Foundry/Plugins/Flatpak/Builder/Manifest-multiple-roots",
+                   test_builder_manifest_multiple_roots);
   return g_test_run ();
 }
