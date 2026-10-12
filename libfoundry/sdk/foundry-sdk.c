@@ -45,6 +45,8 @@
 typedef struct _FoundrySdkPrivate
 {
   GWeakRef provider_wr;
+  GMutex program_cache_mutex;
+  GHashTable *program_cache;
   char *id;
   char *arch;
   char *name;
@@ -52,6 +54,23 @@ typedef struct _FoundrySdkPrivate
   guint extension_only : 1;
   guint installed : 1;
 } FoundrySdkPrivate;
+
+typedef struct
+{
+  DexFuture *future;
+  gint64 expires_at;
+} ProgramCacheEntry;
+
+#define PROGRAM_CACHE_TTL_USEC (30 * G_USEC_PER_SEC)
+
+static void
+program_cache_entry_free (gpointer data)
+{
+  ProgramCacheEntry *entry = data;
+
+  dex_clear (&entry->future);
+  g_free (entry);
+}
 
 enum {
   PROP_0,
@@ -118,7 +137,8 @@ foundry_sdk_real_contains_program_cb (DexFuture *completed,
   foundry_process_launcher_append_argv (state->launcher, state->program);
 
   if (!(subprocess = foundry_process_launcher_spawn_with_flags (state->launcher,
-                                                                G_SUBPROCESS_FLAGS_STDOUT_PIPE,
+                                                                G_SUBPROCESS_FLAGS_STDOUT_PIPE |
+                                                                G_SUBPROCESS_FLAGS_STDERR_SILENCE,
                                                                 &error)))
     return dex_future_new_for_error (g_steal_pointer (&error));
 
@@ -157,6 +177,8 @@ foundry_sdk_finalize (GObject *object)
   FoundrySdkPrivate *priv = foundry_sdk_get_instance_private (self);
 
   g_weak_ref_clear (&priv->provider_wr);
+  g_clear_pointer (&priv->program_cache, g_hash_table_unref);
+  g_mutex_clear (&priv->program_cache_mutex);
 
   g_clear_pointer (&priv->id, g_free);
   g_clear_pointer (&priv->name, g_free);
@@ -343,6 +365,12 @@ foundry_sdk_init (FoundrySdk *self)
   FoundrySdkPrivate *priv = foundry_sdk_get_instance_private (self);
 
   g_weak_ref_init (&priv->provider_wr, NULL);
+  g_mutex_init (&priv->program_cache_mutex);
+
+  priv->program_cache = g_hash_table_new_full (g_str_hash,
+                                               g_str_equal,
+                                               g_free,
+                                               program_cache_entry_free);
 }
 
 /**
@@ -609,6 +637,10 @@ foundry_sdk_set_installed (FoundrySdk *self,
     {
       priv->installed = installed;
 
+      g_mutex_lock (&priv->program_cache_mutex);
+      g_hash_table_remove_all (priv->program_cache);
+      g_mutex_unlock (&priv->program_cache_mutex);
+
       if (foundry_sdk_get_active (self))
         _foundry_contextual_invalidate_pipeline (FOUNDRY_CONTEXTUAL (self));
 
@@ -703,6 +735,11 @@ DexFuture *
 foundry_sdk_contains_program (FoundrySdk *self,
                               const char *program)
 {
+  FoundrySdkPrivate *priv = foundry_sdk_get_instance_private (self);
+  ProgramCacheEntry *entry;
+  DexFuture *future;
+  gint64 now;
+
   dex_return_error_if_fail (FOUNDRY_IS_SDK (self));
   dex_return_error_if_fail (foundry_sdk_get_installed (self));
   dex_return_error_if_fail (program != NULL);
@@ -712,7 +749,31 @@ foundry_sdk_contains_program (FoundrySdk *self,
                                   G_IO_ERROR_FAILED,
                                   "The SDK is not installed");
 
-  return FOUNDRY_SDK_GET_CLASS (self)->contains_program (self, program);
+  /* Reuse in-flight lookups as well as their results. A short lifetime lets
+   * newly installed tools become available without restarting the SDK.
+   */
+  now = g_get_monotonic_time ();
+
+  g_mutex_lock (&priv->program_cache_mutex);
+
+  entry = g_hash_table_lookup (priv->program_cache, program);
+
+  if (entry != NULL && now < entry->expires_at)
+    {
+      future = dex_ref (entry->future);
+    }
+  else
+    {
+      entry = g_new0 (ProgramCacheEntry, 1);
+      entry->future = FOUNDRY_SDK_GET_CLASS (self)->contains_program (self, program);
+      entry->expires_at = now + PROGRAM_CACHE_TTL_USEC;
+      future = dex_ref (entry->future);
+      g_hash_table_replace (priv->program_cache, g_strdup (program), entry);
+    }
+
+  g_mutex_unlock (&priv->program_cache_mutex);
+
+  return future;
 }
 
 static DexFuture *
