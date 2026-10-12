@@ -454,7 +454,8 @@ create_diagnostic (FoundryPtyDiagnostics *self,
   foundry_diagnostic_builder_take_message (builder, g_steal_pointer (&message));
   foundry_diagnostic_builder_set_severity (builder, parsed.severity);
   foundry_diagnostic_builder_set_path (builder, filename);
-  foundry_diagnostic_builder_set_line (builder, parsed.line);
+  if (line != NULL)
+    foundry_diagnostic_builder_set_line (builder, parsed.line);
   foundry_diagnostic_builder_set_line_offset (builder, parsed.column);
 
   return foundry_diagnostic_builder_end (builder);
