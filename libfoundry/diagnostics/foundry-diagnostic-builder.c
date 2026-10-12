@@ -39,6 +39,7 @@ struct _FoundryDiagnosticBuilder
   guint                      line;
   guint                      line_offset;
   FoundryDiagnosticSeverity  severity;
+  gboolean                   has_line;
 };
 
 G_DEFINE_BOXED_TYPE (FoundryDiagnosticBuilder,
@@ -103,6 +104,7 @@ foundry_diagnostic_builder_end (FoundryDiagnosticBuilder *self)
   result->line = self->line;
   result->line_offset = self->line_offset;
   result->severity = self->severity;
+  result->has_line = self->has_line;
 
   g_clear_object (&result->ranges);
   g_clear_object (&result->fixes);
@@ -201,6 +203,7 @@ foundry_diagnostic_builder_set_line (FoundryDiagnosticBuilder *self,
   g_return_if_fail (self != NULL);
 
   self->line = line;
+  self->has_line = TRUE;
 }
 
 void

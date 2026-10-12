@@ -58,6 +58,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 GFile                     *foundry_diagnostic_dup_file          (FoundryDiagnostic       *self);
 FOUNDRY_AVAILABLE_IN_ALL
 guint                      foundry_diagnostic_get_line          (FoundryDiagnostic       *self);
+FOUNDRY_AVAILABLE_IN_1_3
+gboolean                   foundry_diagnostic_has_line          (FoundryDiagnostic       *self);
 FOUNDRY_AVAILABLE_IN_ALL
 guint                      foundry_diagnostic_get_line_offset   (FoundryDiagnostic       *self);
 FOUNDRY_AVAILABLE_IN_ALL

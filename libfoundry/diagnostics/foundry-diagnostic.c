@@ -214,9 +214,10 @@ foundry_diagnostic_init (FoundryDiagnostic *self)
  *
  * Gets the line number of the diagnostic.
  *
- * A value of 0 indicates that the line is unset.
+ * Use [method@Foundry.Diagnostic.has_line] to distinguish a diagnostic on
+ * the first line from one without a line.
  *
- * Returns: A line number starting from 1, or 0 to indicate unset.
+ * Returns: A zero-based line number, or 0 when the line is unset.
  */
 guint
 foundry_diagnostic_get_line (FoundryDiagnostic *self)
@@ -224,6 +225,24 @@ foundry_diagnostic_get_line (FoundryDiagnostic *self)
   g_return_val_if_fail (FOUNDRY_IS_DIAGNOSTIC (self), 0);
 
   return self->line;
+}
+
+/**
+ * foundry_diagnostic_has_line:
+ * @self: a [class@Foundry.Diagnostic]
+ *
+ * Checks whether the diagnostic is associated with a source line.
+ *
+ * Returns: %TRUE if the diagnostic has a line.
+ *
+ * Since: 1.3
+ */
+gboolean
+foundry_diagnostic_has_line (FoundryDiagnostic *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DIAGNOSTIC (self), FALSE);
+
+  return self->has_line;
 }
 
 /**

@@ -39,6 +39,7 @@ struct _FoundryDiagnostic
   guint                      line;
   guint                      line_offset;
   FoundryDiagnosticSeverity  severity;
+  gboolean                   has_line;
 };
 
 G_END_DECLS
