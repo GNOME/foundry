@@ -86,7 +86,8 @@ collect_diagnostic_for_tooltip_cb (FoundryDiagnostic *diagnostic,
   g_assert (FOUNDRY_IS_DIAGNOSTIC (diagnostic));
   g_assert (data != NULL);
 
-  if (foundry_diagnostic_get_line (diagnostic) != data->line)
+  if (!foundry_diagnostic_has_line (diagnostic) ||
+      foundry_diagnostic_get_line (diagnostic) != data->line)
     return;
 
   message = foundry_diagnostic_dup_message (diagnostic);
@@ -210,6 +211,9 @@ foreach_diagnostic_cb (FoundryDiagnostic *diagnostic,
 
   g_assert (FOUNDRY_IS_DIAGNOSTIC (diagnostic));
   g_assert (lines != NULL);
+
+  if (!foundry_diagnostic_has_line (diagnostic))
+    return;
 
   line = foundry_diagnostic_get_line (diagnostic);
 
