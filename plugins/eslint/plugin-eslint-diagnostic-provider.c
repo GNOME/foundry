@@ -51,6 +51,8 @@ parse_results (FoundryContext *context,
 {
   g_autoptr(JsonParser) parser = NULL;
   g_autoptr(GError) error = NULL;
+  const char *data;
+  gsize len;
   JsonNode *root;
   JsonArray *results;
 
@@ -59,12 +61,14 @@ parse_results (FoundryContext *context,
   g_assert (stdout_bytes != NULL);
   g_assert (!file || G_IS_FILE (file));
 
+  data = g_bytes_get_data (stdout_bytes, &len);
+
+  if (len == 0)
+    return;
+
   parser = json_parser_new ();
 
-  if (!json_parser_load_from_data (parser,
-                                   g_bytes_get_data (stdout_bytes, NULL),
-                                   g_bytes_get_size (stdout_bytes),
-                                   &error))
+  if (!json_parser_load_from_data (parser, data, len, &error))
     {
       g_debug ("Failed to parse eslint result: %s", error->message);
       return;
