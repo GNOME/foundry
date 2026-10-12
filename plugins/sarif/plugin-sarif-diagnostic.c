@@ -198,7 +198,8 @@ plugin_sarif_diagnostic_new (FoundryContext *context,
                 {
                   g_autoptr(GFile) file = create_file (uri, uri_base_id, builddir);
 
-                  foundry_diagnostic_builder_set_line (builder, MAX (0, start_line - 1));
+                  if (start_line > 0)
+                    foundry_diagnostic_builder_set_line (builder, start_line - 1);
                   foundry_diagnostic_builder_set_line_offset (builder, MAX (0, start_column - 1));
                   foundry_diagnostic_builder_set_file (builder, file);
                 }
