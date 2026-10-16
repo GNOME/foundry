@@ -289,7 +289,7 @@ foundry_command_stage_class_init (FoundryCommandStageClass *klass)
                           G_PARAM_STATIC_STRINGS));
 
   properties[PROP_QUERY_FILE] =
-    g_param_spec_object ("queyr-file", NULL, NULL,
+    g_param_spec_object ("query-file", NULL, NULL,
                          G_TYPE_FILE,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
