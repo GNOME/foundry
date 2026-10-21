@@ -200,7 +200,7 @@ foundry_build_addin_init (FoundryBuildAddin *self)
  *
  * Gets the pipeline for which the addin belongs.
  *
- * Returns: (transfer full) (nullable): a [class@Foundry.BuildPipeline
+ * Returns: (transfer full) (nullable): a [class@Foundry.BuildPipeline]
  *   or %NULL if the pipeline has been destroyed.
  */
 FoundryBuildPipeline *

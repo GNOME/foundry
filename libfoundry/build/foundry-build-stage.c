@@ -29,7 +29,7 @@
  *
  * A single state in a build pipeline.
  *
- * Abstrct base class for implementing custom stages in the build pipeline.
+ * Abstract base class for implementing custom stages in the build pipeline.
  */
 
 typedef struct

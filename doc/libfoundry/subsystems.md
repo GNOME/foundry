@@ -26,16 +26,16 @@ Instead it is a weak reference which may be upgraded to a full reference when ca
 ## Inhibitor
 
 Use [class@Foundry.Inhibitor] to prevent the shutdown of a context during a long running operation.
-Calls to [method@Foundry.Context.shutdown] will be asynchornously delayed until the inhibitor as released the shutdown lock.
+Calls to [method@Foundry.Context.shutdown] will be asynchronously delayed until the inhibitor has released the shutdown lock.
 
 
 # Services
 
 Many features in Foundry are implemented through independent services.
-The [class@Foundry.Service] base-class is inhereted by these services and attached to the [class@Foundry.Context].
+The [class@Foundry.Service] base-class is inherited by these services and attached to the [class@Foundry.Context].
 
 You may implement your own services in your application using libfoundry.
-Register the dynamically by calling [method@Foundry.Context.dup_service_typed].
+Register them dynamically by calling [method@Foundry.Context.dup_service_typed].
 
 
 # SDK Management
