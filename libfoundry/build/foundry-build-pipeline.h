@@ -42,7 +42,7 @@ DexFuture                 *foundry_build_pipeline_new                (FoundryCon
                                                                       FoundryConfig             *config,
                                                                       FoundryDevice             *device,
                                                                       FoundrySdk                *sdk,
-                                                                      gboolean                   enable_adddins) G_GNUC_WARN_UNUSED_RESULT;
+                                                                      gboolean                   enable_addins) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryBuildProgress      *foundry_build_pipeline_build              (FoundryBuildPipeline      *self,
                                                                       FoundryBuildPipelinePhase  phase,

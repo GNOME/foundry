@@ -100,7 +100,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 char                    *foundry_command_dup_name          (FoundryCommand            *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void                     foundry_command_set_name          (FoundryCommand            *self,
-                                                            const char                *id);
+                                                            const char                *name);
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean                 foundry_command_can_default       (FoundryCommand            *self,
                                                             guint                     *priority);
