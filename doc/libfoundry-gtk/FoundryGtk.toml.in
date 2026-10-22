@@ -29,7 +29,7 @@ search_index = true
   [dependencies."Dex-1"]
   name = "Dex-1"
   description = "Future-based programming for GNOME"
-  docs_url = "https://gnome.pages.gitlab.gnome.org/libdex/"
+  docs_url = "https://gnome.pages.gitlab.gnome.org/libdex/libdex-1/"
 
   [dependencies."Gtk-4.0"]
   name = "Gtk-4.0"
