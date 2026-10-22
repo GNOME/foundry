@@ -9,4 +9,5 @@ baseURLs = [
     [ 'Gsk', 'https://docs.gtk.org/gsk4/' ],
     [ 'Gtk', 'https://docs.gtk.org/gtk4/' ],
     [ 'Json', 'https://gnome.pages.gitlab.gnome.org/json-glib/' ],
+    [ 'Peas', 'https://gnome.pages.gitlab.gnome.org/libpeas/libpeas-2/' ],
 ]
