@@ -35,8 +35,6 @@
 
 #include <libpeas.h>
 
-#include "line-reader-private.h"
-
 #include "foundry-model-manager.h"
 #include "foundry-path.h"
 #include "foundry-triplet.h"
@@ -45,20 +43,17 @@
 static char **
 get_environ_from_stdout (GSubprocess *subprocess)
 {
-  g_autofree char *stdout_buf = NULL;
+  g_autoptr(GBytes) stdout_bytes = NULL;
 
-  if (g_subprocess_communicate_utf8 (subprocess, NULL, NULL, &stdout_buf, NULL, NULL))
+  if (g_subprocess_communicate (subprocess, NULL, NULL, &stdout_bytes, NULL, NULL))
     {
       g_autoptr(GPtrArray) env = g_ptr_array_new_with_free_func (g_free);
-      LineReader reader;
-      gsize line_len;
-      char *line;
+      const char *data = g_bytes_get_data (stdout_bytes, NULL);
+      gsize len = g_bytes_get_size (stdout_bytes);
 
-      line_reader_init (&reader, stdout_buf, -1);
-
-      while ((line = line_reader_next (&reader, &line_len)))
+      for (gsize pos = 0; pos < len; pos += strlen (data + pos) + 1)
         {
-          line[line_len] = 0;
+          const char *line = data + pos;
 
           if (!g_ascii_isalpha (*line) && *line != '_')
             continue;
@@ -116,8 +111,13 @@ _foundry_host_environ (void)
           g_autoptr(GError) error = NULL;
 
           launcher = g_subprocess_launcher_new (G_SUBPROCESS_FLAGS_STDOUT_PIPE);
-          subprocess = g_subprocess_launcher_spawn (launcher, &error,
-                                                    "flatpak-spawn", "--host", "printenv", NULL);
+          subprocess = g_subprocess_launcher_spawn (launcher,
+                                                    &error,
+                                                    "flatpak-spawn",
+                                                    "--host",
+                                                    "env",
+                                                    "-0",
+                                                    NULL);
           if (subprocess != NULL)
             host_environ = get_environ_from_stdout (subprocess);
         }
