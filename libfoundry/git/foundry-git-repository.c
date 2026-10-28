@@ -1905,17 +1905,61 @@ typedef struct _QueryFileStatus
   char *path;
 } QueryFileStatus;
 
+typedef struct _DirectoryStatus
+{
+  const char *path;
+  gsize path_len;
+  git_status_t status;
+} DirectoryStatus;
+
+static int
+foundry_git_repository_directory_status_cb (const char   *path,
+                                            unsigned int  status,
+                                            void         *payload)
+{
+  DirectoryStatus *state = payload;
+
+  if (strncmp (path, state->path, state->path_len) == 0 &&
+      path[state->path_len] == '/')
+    state->status |= status;
+
+  return 0;
+}
+
 static void
 foundry_git_repository_query_file_status_worker (gpointer data)
 {
   QueryFileStatus *state = data;
-  git_status_t status;
+  git_status_t status = GIT_STATUS_CURRENT;
   int rval;
 
   FOUNDRY_TRACE_SCOPE_FUNC ();
 
   g_mutex_lock (&state->self->mutex);
   rval = git_status_file (&status, state->self->repository, state->path);
+
+  if (rval == GIT_EAMBIGUOUS)
+    {
+      /* A directory is ambiguous to git_status_file(). Aggregate only
+       * entries below this path, including those in nested directories.
+       */
+      DirectoryStatus directory_status = { state->path, strlen (state->path), GIT_STATUS_CURRENT };
+      git_status_options opts = GIT_STATUS_OPTIONS_INIT;
+
+      opts.show = GIT_STATUS_SHOW_INDEX_AND_WORKDIR;
+      opts.flags = (GIT_STATUS_OPT_INCLUDE_UNTRACKED |
+                    GIT_STATUS_OPT_RECURSE_UNTRACKED_DIRS |
+                    GIT_STATUS_OPT_DISABLE_PATHSPEC_MATCH);
+      opts.pathspec.strings = &state->path;
+      opts.pathspec.count = 1;
+
+      rval = git_status_foreach_ext (state->self->repository,
+                                     &opts,
+                                     foundry_git_repository_directory_status_cb,
+                                     &directory_status);
+      status = directory_status.status;
+    }
+
   g_mutex_unlock (&state->self->mutex);
 
   if (rval != 0)
