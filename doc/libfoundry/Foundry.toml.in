@@ -22,17 +22,17 @@ search_index = true
   docs_url = "https://docs.gtk.org/glib/"
 
   [dependencies."Gio-2.0"]
-  name = "GIO"
+  name = "Gio"
   description = "GObject Interfaces and Objects, Networking, IPC, and I/O"
   docs_url = "https://docs.gtk.org/gio/"
 
   [dependencies."Dex-1"]
-  name = "Dex-1"
+  name = "Dex"
   description = "Future-based programming for GNOME"
   docs_url = "https://gnome.pages.gitlab.gnome.org/libdex/libdex-1/"
 
   [dependencies."Json-1.0"]
-  name = "Json-1.0"
+  name = "Json"
   description = "JSON parser and generator"
   docs_url = "https://gnome.pages.gitlab.gnome.org/json-glib/"
 
