@@ -18,7 +18,7 @@ search_index = true
 
   [dependencies."GLib-2.0"]
   name = "GLib"
-  description = "The base type system library"
+  description = "The base utility library"
   docs_url = "https://docs.gtk.org/glib/"
 
   [dependencies."Gio-2.0"]

@@ -18,7 +18,7 @@ search_index = true
 
   [dependencies."GLib-2.0"]
   name = "GLib"
-  description = "The base type system library"
+  description = "The base utility library"
   docs_url = "https://docs.gtk.org/glib/"
 
   [dependencies."Gio-2.0"]
@@ -38,12 +38,12 @@ search_index = true
 
   [dependencies."Gdk-4.0"]
   name = "Gdk-4.0"
-  description = "The GTK toolkit"
+  description = "The GTK windowing system abstraction"
   docs_url = "https://docs.gtk.org/gdk4/"
 
   [dependencies."Gsk-4.0"]
   name = "Gsk-4.0"
-  description = "The GTK toolkit"
+  description = "The GTK rendering abstraction"
   docs_url = "https://docs.gtk.org/gsk4/"
 
   [dependencies."Json-1.0"]
