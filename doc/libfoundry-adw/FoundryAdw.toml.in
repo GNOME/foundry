@@ -46,6 +46,11 @@ search_index = true
   description = "The GTK rendering abstraction"
   docs_url = "https://docs.gtk.org/gsk4/"
 
+  [dependencies."Adw-1"]
+  name = "Adw"
+  description = "Building blocks for modern GNOME applications"
+  docs_url = "https://gnome.pages.gitlab.gnome.org/libadwaita/doc/1-latest/"
+
   [dependencies."Json-1.0"]
   name = "Json"
   description = "JSON parser and generator"
