@@ -443,6 +443,13 @@ foundry_context_class_init (FoundryContextClass *klass)
   object_class->set_property = foundry_context_set_property;
 
 #ifdef FOUNDRY_FEATURE_ACP
+  /**
+   * FoundryContext:acp-manager:
+   *
+   * The ACP manager for the project.
+   *
+   * Since: 1.2
+   */
   properties[PROP_ACP_MANAGER] =
     g_param_spec_object ("acp-manager", NULL, NULL,
                          FOUNDRY_TYPE_ACP_MANAGER,
@@ -450,6 +457,13 @@ foundry_context_class_init (FoundryContextClass *klass)
                           G_PARAM_STATIC_STRINGS));
 #endif
 
+  /**
+   * FoundryContext:build-manager:
+   *
+   * The build manager for the project.
+   *
+   * Since: 1.0
+   */
   properties[PROP_BUILD_MANAGER] =
     g_param_spec_object ("build-manager", NULL, NULL,
                          FOUNDRY_TYPE_BUILD_MANAGER,
@@ -469,18 +483,40 @@ foundry_context_class_init (FoundryContextClass *klass)
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
+  /**
+   * FoundryContext:build-system:
+   *
+   * The name of the build system to use for the project, or %NULL if none
+   * has been selected.
+   *
+   * Since: 1.0
+   */
   properties[PROP_BUILD_SYSTEM] =
     g_param_spec_string ("build-system", NULL, NULL,
                          NULL,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
+  /**
+   * FoundryContext:command-manager:
+   *
+   * The command manager for the project.
+   *
+   * Since: 1.0
+   */
   properties[PROP_COMMAND_MANAGER] =
     g_param_spec_object ("command-manager", NULL, NULL,
                          FOUNDRY_TYPE_COMMAND_MANAGER,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
+  /**
+   * FoundryContext:config-manager:
+   *
+   * The configuration manager for the project.
+   *
+   * Since: 1.0
+   */
   properties[PROP_CONFIG_MANAGER] =
     g_param_spec_object ("config-manager", NULL, NULL,
                          FOUNDRY_TYPE_CONFIG_MANAGER,
@@ -488,6 +524,13 @@ foundry_context_class_init (FoundryContextClass *klass)
                           G_PARAM_STATIC_STRINGS));
 
 #ifdef FOUNDRY_FEATURE_DEBUGGER
+  /**
+   * FoundryContext:debugger-manager:
+   *
+   * The debugger manager for the project.
+   *
+   * Since: 1.0
+   */
   properties[PROP_DEBUGGER_MANAGER] =
     g_param_spec_object ("debugger-manager", NULL, NULL,
                          FOUNDRY_TYPE_DEBUGGER_MANAGER,
@@ -495,18 +538,39 @@ foundry_context_class_init (FoundryContextClass *klass)
                           G_PARAM_STATIC_STRINGS));
 #endif
 
+  /**
+   * FoundryContext:dependency-manager:
+   *
+   * The dependency manager for the project.
+   *
+   * Since: 1.0
+   */
   properties[PROP_DEPENDENCY_MANAGER] =
     g_param_spec_object ("dependency-manager", NULL, NULL,
                          FOUNDRY_TYPE_DEPENDENCY_MANAGER,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
+  /**
+   * FoundryContext:device-manager:
+   *
+   * The device manager for the project.
+   *
+   * Since: 1.0
+   */
   properties[PROP_DEVICE_MANAGER] =
     g_param_spec_object ("device-manager", NULL, NULL,
                          FOUNDRY_TYPE_DEVICE_MANAGER,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
+  /**
+   * FoundryContext:diagnostic-manager:
+   *
+   * The diagnostic manager for the project.
+   *
+   * Since: 1.0
+   */
   properties[PROP_DIAGNOSTIC_MANAGER] =
     g_param_spec_object ("diagnostic-manager", NULL, NULL,
                          FOUNDRY_TYPE_DIAGNOSTIC_MANAGER,
@@ -515,6 +579,8 @@ foundry_context_class_init (FoundryContextClass *klass)
 
   /**
    * FoundryContext:doap-service:
+   *
+   * The DOAP service for the project.
    *
    * Since: 1.1
    */
@@ -525,6 +591,13 @@ foundry_context_class_init (FoundryContextClass *klass)
                           G_PARAM_STATIC_STRINGS));
 
 #ifdef FOUNDRY_FEATURE_DOCS
+  /**
+   * FoundryContext:documentation-manager:
+   *
+   * The documentation manager for the project.
+   *
+   * Since: 1.0
+   */
   properties[PROP_DOCUMENTATION_MANAGER] =
     g_param_spec_object ("documentation-manager", NULL, NULL,
                          FOUNDRY_TYPE_DOCUMENTATION_MANAGER,
@@ -532,12 +605,26 @@ foundry_context_class_init (FoundryContextClass *klass)
                           G_PARAM_STATIC_STRINGS));
 #endif
 
+  /**
+   * FoundryContext:file-manager:
+   *
+   * The file manager for the project.
+   *
+   * Since: 1.0
+   */
   properties[PROP_FILE_MANAGER] =
     g_param_spec_object ("file-manager", NULL, NULL,
                          FOUNDRY_TYPE_FILE_MANAGER,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
+  /**
+   * FoundryContext:intent-manager:
+   *
+   * The intent manager for the project.
+   *
+   * Since: 1.0
+   */
   properties[PROP_INTENT_MANAGER] =
     g_param_spec_object ("intent-manager", NULL, NULL,
                          FOUNDRY_TYPE_INTENT_MANAGER,
@@ -547,6 +634,8 @@ foundry_context_class_init (FoundryContextClass *klass)
 #ifdef FOUNDRY_FEATURE_FORGE
   /**
    * FoundryContext:forge-manager:
+   *
+   * The forge manager for the project.
    *
    * Since: 1.1
    */
@@ -558,6 +647,13 @@ foundry_context_class_init (FoundryContextClass *klass)
 #endif
 
 #ifdef FOUNDRY_FEATURE_LLM
+  /**
+   * FoundryContext:llm-manager:
+   *
+   * The LLM manager for the project.
+   *
+   * Since: 1.0
+   */
   properties[PROP_LLM_MANAGER] =
     g_param_spec_object ("llm-manager", NULL, NULL,
                          FOUNDRY_TYPE_LLM_MANAGER,
@@ -565,6 +661,13 @@ foundry_context_class_init (FoundryContextClass *klass)
                           G_PARAM_STATIC_STRINGS));
 #endif
 
+  /**
+   * FoundryContext:log-manager:
+   *
+   * The log manager for the project.
+   *
+   * Since: 1.0
+   */
   properties[PROP_LOG_MANAGER] =
     g_param_spec_object ("log-manager", NULL, NULL,
                          FOUNDRY_TYPE_LOG_MANAGER,
@@ -572,6 +675,13 @@ foundry_context_class_init (FoundryContextClass *klass)
                           G_PARAM_STATIC_STRINGS));
 
 #ifdef FOUNDRY_FEATURE_LSP
+  /**
+   * FoundryContext:lsp-manager:
+   *
+   * The LSP manager for the project.
+   *
+   * Since: 1.0
+   */
   properties[PROP_LSP_MANAGER] =
     g_param_spec_object ("lsp-manager", NULL, NULL,
                          FOUNDRY_TYPE_LSP_MANAGER,
@@ -579,6 +689,13 @@ foundry_context_class_init (FoundryContextClass *klass)
                           G_PARAM_STATIC_STRINGS));
 #endif
 
+  /**
+   * FoundryContext:operation-manager:
+   *
+   * The operation manager for the project.
+   *
+   * Since: 1.0
+   */
   properties[PROP_OPERATION_MANAGER] =
     g_param_spec_object ("operation-manager", NULL, NULL,
                          FOUNDRY_TYPE_OPERATION_MANAGER,
@@ -591,30 +708,60 @@ foundry_context_class_init (FoundryContextClass *klass)
    * The directory containing the project.
    *
    * This is generally the directory which contains ".git" and ".foundry".
+   *
+   * Since: 1.0
    */
   properties[PROP_PROJECT_DIRECTORY] =
     g_param_spec_object ("project-directory", NULL, NULL,
                          G_TYPE_FILE,
                          (G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
+  /**
+   * FoundryContext:run-manager:
+   *
+   * The run manager for the project.
+   *
+   * Since: 1.0
+   */
   properties[PROP_RUN_MANAGER] =
     g_param_spec_object ("run-manager", NULL, NULL,
                          FOUNDRY_TYPE_RUN_MANAGER,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
+  /**
+   * FoundryContext:sdk-manager:
+   *
+   * The SDK manager for the project.
+   *
+   * Since: 1.0
+   */
   properties[PROP_SDK_MANAGER] =
     g_param_spec_object ("sdk-manager", NULL, NULL,
                          FOUNDRY_TYPE_SDK_MANAGER,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
+  /**
+   * FoundryContext:search-manager:
+   *
+   * The search manager for the project.
+   *
+   * Since: 1.0
+   */
   properties[PROP_SEARCH_MANAGER] =
     g_param_spec_object ("search-manager", NULL, NULL,
                          FOUNDRY_TYPE_SEARCH_MANAGER,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
+  /**
+   * FoundryContext:secret-service:
+   *
+   * The secret service for the project.
+   *
+   * Since: 1.1
+   */
   properties[PROP_SECRET_SERVICE] =
     g_param_spec_object ("secret-service", NULL, NULL,
                          FOUNDRY_TYPE_SECRET_SERVICE,
@@ -626,12 +773,21 @@ foundry_context_class_init (FoundryContextClass *klass)
    *
    * The directory of the context, which is typically ".foundry" within
    * the #FoundryContext:project-directory.
+   *
+   * Since: 1.0
    */
   properties[PROP_STATE_DIRECTORY] =
     g_param_spec_object ("state-directory", NULL, NULL,
                          G_TYPE_FILE,
                          (G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
+  /**
+   * FoundryContext:test-manager:
+   *
+   * The test manager for the project.
+   *
+   * Since: 1.0
+   */
   properties[PROP_TEST_MANAGER] =
     g_param_spec_object ("test-manager", NULL, NULL,
                          FOUNDRY_TYPE_TEST_MANAGER,
@@ -639,6 +795,13 @@ foundry_context_class_init (FoundryContextClass *klass)
                           G_PARAM_STATIC_STRINGS));
 
 #ifdef FOUNDRY_FEATURE_TERMINAL
+  /**
+   * FoundryContext:terminal-service:
+   *
+   * The terminal service for the project.
+   *
+   * Since: 1.1
+   */
   properties[PROP_TERMINAL_SERVICE] =
     g_param_spec_object ("terminal-service", NULL, NULL,
                          FOUNDRY_TYPE_TERMINAL_SERVICE,
@@ -664,6 +827,13 @@ foundry_context_class_init (FoundryContextClass *klass)
                           G_PARAM_STATIC_STRINGS));
 
 #ifdef FOUNDRY_FEATURE_TEXT
+  /**
+   * FoundryContext:text-manager:
+   *
+   * The text manager for the project.
+   *
+   * Since: 1.0
+   */
   properties[PROP_TEXT_MANAGER] =
     g_param_spec_object ("text-manager", NULL, NULL,
                          FOUNDRY_TYPE_TEXT_MANAGER,
@@ -671,12 +841,26 @@ foundry_context_class_init (FoundryContextClass *klass)
                           G_PARAM_STATIC_STRINGS));
 #endif
 
+  /**
+   * FoundryContext:tweak-manager:
+   *
+   * The tweak manager for the project.
+   *
+   * Since: 1.0
+   */
   properties[PROP_TWEAK_MANAGER] =
     g_param_spec_object ("tweak-manager", NULL, NULL,
                          FOUNDRY_TYPE_TWEAK_MANAGER,
                          (G_PARAM_READABLE |
                           G_PARAM_STATIC_STRINGS));
 
+  /**
+   * FoundryContext:title:
+   *
+   * The title of the context, or %NULL if no title has been set.
+   *
+   * Since: 1.0
+   */
   properties[PROP_TITLE] =
     g_param_spec_string ("title", NULL, NULL,
                          NULL,
@@ -685,6 +869,13 @@ foundry_context_class_init (FoundryContextClass *klass)
                           G_PARAM_STATIC_STRINGS));
 
 #ifdef FOUNDRY_FEATURE_VCS
+  /**
+   * FoundryContext:vcs-manager:
+   *
+   * The version control manager for the project.
+   *
+   * Since: 1.0
+   */
   properties[PROP_VCS_MANAGER] =
     g_param_spec_object ("vcs-manager", NULL, NULL,
                          FOUNDRY_TYPE_VCS_MANAGER,
