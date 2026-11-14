@@ -56,6 +56,9 @@ FOUNDRY_AVAILABLE_IN_ALL
 guint                      foundry_diagnostic_hash              (gconstpointer            data);
 FOUNDRY_AVAILABLE_IN_ALL
 GFile                     *foundry_diagnostic_dup_file          (FoundryDiagnostic       *self);
+FOUNDRY_AVAILABLE_IN_1_3
+gboolean                   foundry_diagnostic_matches_file      (FoundryDiagnostic       *self,
+                                                                 GFile                   *file);
 FOUNDRY_AVAILABLE_IN_ALL
 guint                      foundry_diagnostic_get_line          (FoundryDiagnostic       *self);
 FOUNDRY_AVAILABLE_IN_1_3

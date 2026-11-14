@@ -354,6 +354,27 @@ foundry_diagnostic_dup_file (FoundryDiagnostic *self)
 }
 
 /**
+ * foundry_diagnostic_matches_file:
+ * @self: a [class@Foundry.Diagnostic]
+ * @file: a [iface@Gio.File]
+ *
+ * Checks whether the diagnostic belongs to @file.
+ *
+ * Returns: %TRUE if the diagnostic has a file equal to @file
+ *
+ * Since: 1.3
+ */
+gboolean
+foundry_diagnostic_matches_file (FoundryDiagnostic *self,
+                                 GFile             *file)
+{
+  g_return_val_if_fail (FOUNDRY_IS_DIAGNOSTIC (self), FALSE);
+  g_return_val_if_fail (G_IS_FILE (file), FALSE);
+
+  return self->file != NULL && g_file_equal (self->file, file);
+}
+
+/**
  * foundry_diagnostic_dup_markup:
  * @self: a [class@Foundry.Diagnostic]
  *

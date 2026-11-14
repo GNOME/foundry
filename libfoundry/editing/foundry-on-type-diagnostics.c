@@ -41,6 +41,7 @@ struct _FoundryOnTypeDiagnostics
   GWeakRef    document_wr;
   DexPromise *disposed;
   GListModel *model;
+  GListStore *visible;
   GArray     *cache;
   gulong      items_changed_handler;
 };
@@ -56,10 +57,7 @@ foundry_on_type_diagnostics_get_n_items (GListModel *model)
 {
   FoundryOnTypeDiagnostics *self = FOUNDRY_ON_TYPE_DIAGNOSTICS (model);
 
-  if (self->model == NULL)
-    return 0;
-
-  return g_list_model_get_n_items (self->model);
+  return g_list_model_get_n_items (G_LIST_MODEL (self->visible));
 }
 
 static gpointer
@@ -68,10 +66,7 @@ foundry_on_type_diagnostics_get_item (GListModel *model,
 {
   FoundryOnTypeDiagnostics *self = FOUNDRY_ON_TYPE_DIAGNOSTICS (model);
 
-  if (self->model == NULL)
-    return NULL;
-
-  return g_list_model_get_item (self->model, position);
+  return g_list_model_get_item (G_LIST_MODEL (self->visible), position);
 }
 
 static void
@@ -113,7 +108,7 @@ foundry_on_type_diagnostics_ensure_cache (FoundryOnTypeDiagnostics *self)
 
   g_assert (FOUNDRY_IS_ON_TYPE_DIAGNOSTICS (self));
 
-  if (self->cache != NULL || self->model == NULL)
+  if (self->cache != NULL)
     return;
 
   n_items = g_list_model_get_n_items (G_LIST_MODEL (self));
@@ -123,7 +118,8 @@ foundry_on_type_diagnostics_ensure_cache (FoundryOnTypeDiagnostics *self)
 
   for (guint i = 0; i < n_items; i++)
     {
-      g_autoptr(FoundryDiagnostic) diagnostic = g_list_model_get_item (self->model, i);
+      g_autoptr(FoundryDiagnostic) diagnostic = g_list_model_get_item (G_LIST_MODEL (self->visible), i);
+
       CacheEntry *entry = &g_array_index (self->cache, CacheEntry, i);
 
       entry->line = foundry_diagnostic_get_line (diagnostic);
@@ -146,6 +142,7 @@ foundry_on_type_diagnostics_dispose (GObject *object)
 
   g_clear_signal_handler (&self->items_changed_handler, self->model);
   g_clear_object (&self->model);
+  g_clear_object (&self->visible);
   g_clear_pointer (&self->cache, g_array_unref);
 
   G_OBJECT_CLASS (foundry_on_type_diagnostics_parent_class)->dispose (object);
@@ -175,17 +172,68 @@ static void
 foundry_on_type_diagnostics_init (FoundryOnTypeDiagnostics *self)
 {
   self->disposed = dex_promise_new ();
+  self->visible = g_list_store_new (FOUNDRY_TYPE_DIAGNOSTIC);
+
+  g_signal_connect_object (self->visible,
+                           "items-changed",
+                           G_CALLBACK (g_list_model_items_changed),
+                           self,
+                           G_CONNECT_SWAPPED);
 
   dex_future_disown (dex_ref (DEX_FUTURE (self->disposed)));
+}
+
+static void
+foundry_on_type_diagnostics_update_visible (FoundryOnTypeDiagnostics *self)
+{
+  g_autoptr(FoundryTextDocument) document = NULL;
+  g_autoptr(GPtrArray) items = NULL;
+  g_autoptr(GFile) file = NULL;
+  guint old_n_items;
+
+  g_assert (FOUNDRY_IS_ON_TYPE_DIAGNOSTICS (self));
+
+  items = g_ptr_array_new_with_free_func (g_object_unref);
+  document = g_weak_ref_get (&self->document_wr);
+
+  if (document != NULL)
+    file = foundry_text_document_dup_file (document);
+
+  if (file != NULL && self->model != NULL)
+    {
+      guint n_items = g_list_model_get_n_items (self->model);
+
+      for (guint i = 0; i < n_items; i++)
+        {
+          g_autoptr(FoundryDiagnostic) diagnostic = g_list_model_get_item (self->model, i);
+
+          if (foundry_diagnostic_matches_file (diagnostic, file))
+            g_ptr_array_add (items, g_steal_pointer (&diagnostic));
+        }
+    }
+
+  old_n_items = g_list_model_get_n_items (G_LIST_MODEL (self->visible));
+  g_clear_pointer (&self->cache, g_array_unref);
+  g_list_store_splice (self->visible, 0, old_n_items, items->pdata, items->len);
+}
+
+static void
+foundry_on_type_diagnostics_items_changed (FoundryOnTypeDiagnostics *self,
+                                           guint                     position,
+                                           guint                     removed,
+                                           guint                     added,
+                                           GListModel               *model)
+{
+  g_assert (FOUNDRY_IS_ON_TYPE_DIAGNOSTICS (self));
+  g_assert (model == self->model);
+
+  foundry_on_type_diagnostics_update_visible (self);
 }
 
 static void
 foundry_on_type_diagnostics_replace (FoundryOnTypeDiagnostics *self,
                                      GListModel               *model)
 {
-  guint old_n_items = 0;
-  guint new_n_items = 0;
-
   g_assert (FOUNDRY_IS_ON_TYPE_DIAGNOSTICS (self));
   g_assert (!model || G_IS_LIST_MODEL (model));
 
@@ -194,11 +242,8 @@ foundry_on_type_diagnostics_replace (FoundryOnTypeDiagnostics *self,
   if (self->model == model)
     return;
 
-  g_clear_pointer (&self->cache, g_array_unref);
-
   if (self->model != NULL)
     {
-      old_n_items = g_list_model_get_n_items (self->model);
       g_clear_signal_handler (&self->items_changed_handler, self->model);
       g_clear_object (&self->model);
     }
@@ -206,16 +251,15 @@ foundry_on_type_diagnostics_replace (FoundryOnTypeDiagnostics *self,
   if (model != NULL)
     {
       self->model = g_object_ref (model);
-      self->items_changed_handler = g_signal_connect_object (model,
-                                                             "items-changed",
-                                                             G_CALLBACK (g_list_model_items_changed),
-                                                             self,
-                                                             G_CONNECT_SWAPPED);
-      new_n_items = g_list_model_get_n_items (model);
+      self->items_changed_handler =
+        g_signal_connect_object (model,
+                                 "items-changed",
+                                 G_CALLBACK (foundry_on_type_diagnostics_items_changed),
+                                 self,
+                                 G_CONNECT_SWAPPED);
     }
 
-  if (old_n_items || new_n_items)
-    g_list_model_items_changed (G_LIST_MODEL (self), 0, old_n_items, new_n_items);
+  foundry_on_type_diagnostics_update_visible (self);
 }
 
 static DexFuture *
@@ -344,7 +388,7 @@ foundry_on_type_diagnostics_foreach_in_range (FoundryOnTypeDiagnostics          
 
   foundry_on_type_diagnostics_ensure_cache (self);
 
-  if (self->model == NULL || self->cache == NULL || self->cache->len == 0)
+  if (self->cache == NULL || self->cache->len == 0)
     return;
 
   /* TODO: Opportunity to bsearch here when the number of diagnostics
@@ -363,7 +407,7 @@ foundry_on_type_diagnostics_foreach_in_range (FoundryOnTypeDiagnostics          
         break;
 
       {
-        g_autoptr(FoundryDiagnostic) diagnostic = g_list_model_get_item (self->model, entry->index);
+        g_autoptr(FoundryDiagnostic) diagnostic = g_list_model_get_item (G_LIST_MODEL (self->visible), entry->index);
 
         if (diagnostic == NULL)
           break;
@@ -381,7 +425,7 @@ foundry_on_type_diagnostics_line_has_diagnostic (FoundryOnTypeDiagnostics *self,
 
   foundry_on_type_diagnostics_ensure_cache (self);
 
-  if (self->model == NULL || self->cache == NULL || self->cache->len == 0)
+  if (self->cache == NULL || self->cache->len == 0)
     return FALSE;
 
   for (guint i = 0; i < self->cache->len; i++)
