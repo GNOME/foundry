@@ -27,6 +27,7 @@
 
 #include "foundry-file-row.h"
 #include "foundry-page.h"
+#include "foundry-page-addin.h"
 #include "foundry-panel.h"
 #include "foundry-search-dialog.h"
 #include "foundry-workspace.h"
@@ -51,6 +52,7 @@ _foundry_adw_init_once (void)
 
   g_type_ensure (FOUNDRY_TYPE_FILE_ROW);
   g_type_ensure (FOUNDRY_TYPE_PAGE);
+  g_type_ensure (FOUNDRY_TYPE_PAGE_ADDIN);
   g_type_ensure (FOUNDRY_TYPE_PANEL);
   g_type_ensure (FOUNDRY_TYPE_SEARCH_DIALOG);
   g_type_ensure (FOUNDRY_TYPE_WORKSPACE);

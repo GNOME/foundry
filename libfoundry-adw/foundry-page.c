@@ -20,11 +20,17 @@
 
 #include "config.h"
 
+#include <libpeas.h>
+
 #include "foundry-page-private.h"
+#include "foundry-page-addin-private.h"
 #include "foundry-workspace-private.h"
 
 typedef struct
 {
+  PeasExtensionSet        *addins;
+  gulong                   addin_added_handler;
+  gulong                   addin_removed_handler;
   GtkWidget               *content;
   GtkWidget               *auxiliary;
   FoundryActionMuxer      *muxer;
@@ -156,6 +162,47 @@ foundry_page_focus_controller_notify_cb (FoundryPage             *self,
 }
 
 static void
+foundry_page_addin_added (PeasExtensionSet *set,
+                          PeasPluginInfo   *plugin_info,
+                          GObject          *addin,
+                          gpointer          user_data)
+{
+  FoundryPage *self = user_data;
+
+  g_assert (FOUNDRY_IS_PAGE (self));
+  g_assert (FOUNDRY_IS_PAGE_ADDIN (addin));
+
+  _foundry_page_addin_load (FOUNDRY_PAGE_ADDIN (addin), self);
+}
+
+static void
+foundry_page_addin_removed (PeasExtensionSet *set,
+                            PeasPluginInfo   *plugin_info,
+                            GObject          *addin,
+                            gpointer          user_data)
+{
+  g_assert (FOUNDRY_IS_PAGE_ADDIN (addin));
+
+  _foundry_page_addin_unload (FOUNDRY_PAGE_ADDIN (addin));
+}
+
+static void
+foundry_page_clear_addins (FoundryPage *self)
+{
+  FoundryPagePrivate *priv = foundry_page_get_instance_private (self);
+  g_autoptr(PeasExtensionSet) addins = g_steal_pointer (&priv->addins);
+
+  g_assert (FOUNDRY_IS_PAGE (self));
+
+  if (addins != NULL)
+    {
+      g_clear_signal_handler (&priv->addin_added_handler, addins);
+      g_clear_signal_handler (&priv->addin_removed_handler, addins);
+      peas_extension_set_foreach (addins, foundry_page_addin_removed, self);
+    }
+}
+
+static void
 foundry_page_root (GtkWidget *widget)
 {
   FoundryPage *self = (FoundryPage *)widget;
@@ -163,11 +210,29 @@ foundry_page_root (GtkWidget *widget)
   GtkWidget *workspace;
 
   g_assert (FOUNDRY_IS_PAGE (self));
+  g_assert (priv->addins == NULL);
 
   GTK_WIDGET_CLASS (foundry_page_parent_class)->root (widget);
 
   if ((workspace = gtk_widget_get_ancestor (widget, FOUNDRY_TYPE_WORKSPACE)))
     g_weak_ref_set (&priv->workspace_wr, workspace);
+
+  priv->addins = peas_extension_set_new (peas_engine_get_default (),
+                                         FOUNDRY_TYPE_PAGE_ADDIN,
+                                         NULL);
+  priv->addin_added_handler =
+    g_signal_connect_object (priv->addins,
+                             "extension-added",
+                             G_CALLBACK (foundry_page_addin_added),
+                             self,
+                             0);
+  priv->addin_removed_handler =
+    g_signal_connect_object (priv->addins,
+                             "extension-removed",
+                             G_CALLBACK (foundry_page_addin_removed),
+                             self,
+                             0);
+  peas_extension_set_foreach (priv->addins, foundry_page_addin_added, self);
 }
 
 static void
@@ -178,6 +243,8 @@ foundry_page_unroot (GtkWidget *widget)
   g_autoptr(FoundryWorkspace) workspace = NULL;
 
   g_assert (FOUNDRY_IS_PAGE (self));
+
+  foundry_page_clear_addins (self);
 
   if ((workspace = g_weak_ref_get (&priv->workspace_wr)))
     {
@@ -251,6 +318,8 @@ foundry_page_dispose (GObject *object)
   FoundryPage *self = (FoundryPage *)object;
   FoundryPagePrivate *priv = foundry_page_get_instance_private (self);
   GtkWidget *child;
+
+  foundry_page_clear_addins (self);
 
   foundry_action_muxer_remove_all (priv->muxer);
 

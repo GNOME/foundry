@@ -29,6 +29,7 @@
 # include "foundry-file-navigator.h"
 # include "foundry-file-row.h"
 # include "foundry-page.h"
+# include "foundry-page-addin.h"
 # include "foundry-panel.h"
 # include "foundry-panel-bar.h"
 # include "foundry-path-bar.h"
