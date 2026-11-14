@@ -843,7 +843,7 @@ foundry_source_view_init (FoundrySourceView *self)
   self->changes_gutter_renderer = foundry_changes_gutter_renderer_new ();
   gtk_widget_set_size_request (GTK_WIDGET (self->changes_gutter_renderer), 6, -1);
   gtk_widget_set_visible (GTK_WIDGET (self->changes_gutter_renderer), self->show_line_changes);
-  gtk_source_gutter_insert (gutter, self->changes_gutter_renderer, 100);
+  gtk_source_gutter_insert (gutter, self->changes_gutter_renderer, -100);
 
   gutter = gtk_source_view_get_gutter (GTK_SOURCE_VIEW (self), GTK_TEXT_WINDOW_RIGHT);
   self->overview_gutter_renderer = g_object_new (FOUNDRY_TYPE_CHANGES_GUTTER_RENDERER,
@@ -1297,7 +1297,7 @@ foundry_source_view_set_show_diagnostics (FoundrySourceView *self,
 
           gutter = gtk_source_view_get_gutter (GTK_SOURCE_VIEW (self), GTK_TEXT_WINDOW_LEFT);
           self->diagnostics_gutter_renderer = foundry_diagnostics_gutter_renderer_new (diagnostics);
-          gtk_source_gutter_insert (gutter, self->diagnostics_gutter_renderer, -100);
+          gtk_source_gutter_insert (gutter, self->diagnostics_gutter_renderer, -200);
         }
 
       if (self->diagnostics_gutter_renderer != NULL)
