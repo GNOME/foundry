@@ -35,49 +35,53 @@ FOUNDRY_AVAILABLE_IN_ALL
 G_DECLARE_FINAL_TYPE (FoundryTextDocument, foundry_text_document, FOUNDRY, TEXT_DOCUMENT, FoundryContextual)
 
 FOUNDRY_AVAILABLE_IN_ALL
-char                     *foundry_text_document_dup_uri           (FoundryTextDocument  *self);
+char                     *foundry_text_document_dup_uri                (FoundryTextDocument  *self);
 FOUNDRY_AVAILABLE_IN_ALL
-GFile                    *foundry_text_document_dup_file          (FoundryTextDocument  *self);
+GFile                    *foundry_text_document_dup_file               (FoundryTextDocument  *self);
 FOUNDRY_AVAILABLE_IN_ALL
-char                     *foundry_text_document_dup_title         (FoundryTextDocument  *self);
+char                     *foundry_text_document_dup_title              (FoundryTextDocument  *self);
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryTextBuffer        *foundry_text_document_dup_buffer        (FoundryTextDocument  *self);
+FoundryTextBuffer        *foundry_text_document_dup_buffer             (FoundryTextDocument  *self);
+FOUNDRY_AVAILABLE_IN_1_3
+FoundryCodeFoldProvider  *foundry_text_document_dup_code_fold_provider (FoundryTextDocument  *self);
+FOUNDRY_AVAILABLE_IN_1_3
+DexFuture                *foundry_text_document_list_code_folds        (FoundryTextDocument  *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-GIcon                    *foundry_text_document_dup_icon          (FoundryTextDocument  *self);
+GIcon                    *foundry_text_document_dup_icon               (FoundryTextDocument  *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture                *foundry_text_document_when_changed      (FoundryTextDocument  *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                *foundry_text_document_when_changed           (FoundryTextDocument  *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture                *foundry_text_document_list_code_actions (FoundryTextDocument  *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                *foundry_text_document_list_code_actions      (FoundryTextDocument  *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture                *foundry_text_document_diagnose          (FoundryTextDocument  *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                *foundry_text_document_diagnose               (FoundryTextDocument  *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-FoundryOnTypeDiagnostics *foundry_text_document_watch_diagnostics (FoundryTextDocument  *self);
+FoundryOnTypeDiagnostics *foundry_text_document_watch_diagnostics      (FoundryTextDocument  *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture                *foundry_text_document_list_symbols      (FoundryTextDocument  *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                *foundry_text_document_list_symbols           (FoundryTextDocument  *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_1_1
-DexFuture                *foundry_text_document_find_symbol_at    (FoundryTextDocument  *self,
-                                                                   guint                 line,
-                                                                   guint                 line_offset) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                *foundry_text_document_find_symbol_at         (FoundryTextDocument  *self,
+                                                                        guint                 line,
+                                                                        guint                 line_offset) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean                  foundry_text_document_apply_edit        (FoundryTextDocument  *self,
-                                                                   FoundryTextEdit      *edit);
+gboolean                  foundry_text_document_apply_edit             (FoundryTextDocument  *self,
+                                                                        FoundryTextEdit      *edit);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean                  foundry_text_document_apply_edits       (FoundryTextDocument  *self,
-                                                                   FoundryTextEdit     **edits,
-                                                                   guint                 n_edits);
+gboolean                  foundry_text_document_apply_edits            (FoundryTextDocument  *self,
+                                                                        FoundryTextEdit     **edits,
+                                                                        guint                 n_edits);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture                *foundry_text_document_save              (FoundryTextDocument  *self,
-                                                                   FoundryOperation     *operation) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                *foundry_text_document_save                   (FoundryTextDocument  *self,
+                                                                        FoundryOperation     *operation) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture                *foundry_text_document_save_as           (FoundryTextDocument  *self,
-                                                                   GFile                *file,
-                                                                   FoundryOperation     *operation) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                *foundry_text_document_save_as                (FoundryTextDocument  *self,
+                                                                        GFile                *file,
+                                                                        FoundryOperation     *operation) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-GListModel               *foundry_text_document_list_addins       (FoundryTextDocument  *self);
+GListModel               *foundry_text_document_list_addins            (FoundryTextDocument  *self);
 FOUNDRY_AVAILABLE_IN_ALL
-DexFuture                *foundry_text_document_load_settings     (FoundryTextDocument  *self) G_GNUC_WARN_UNUSED_RESULT;
+DexFuture                *foundry_text_document_load_settings          (FoundryTextDocument  *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
-gpointer                  foundry_text_document_find_addin        (FoundryTextDocument  *self,
-                                                                   const char           *module_name);
+gpointer                  foundry_text_document_find_addin             (FoundryTextDocument  *self,
+                                                                        const char           *module_name);
 
 G_END_DECLS

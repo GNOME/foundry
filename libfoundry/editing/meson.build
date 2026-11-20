@@ -1,6 +1,8 @@
 libfoundry_config_conf.set10('FOUNDRY_FEATURE_TEXT', true)
 
 foundry_sources += files([
+  'foundry-code-fold.c',
+  'foundry-code-fold-provider.c',
   'foundry-code-action.c',
   'foundry-on-type-diagnostics.c',
   'foundry-on-type-formatter.c',
@@ -22,6 +24,8 @@ foundry_private_sources += files([
 ])
 
 foundry_headers += files([
+  'foundry-code-fold.h',
+  'foundry-code-fold-provider.h',
   'foundry-code-action.h',
   'foundry-on-type-diagnostics.h',
   'foundry-on-type-formatter.h',

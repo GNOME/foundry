@@ -23,9 +23,11 @@
 #include <libpeas.h>
 
 #include "foundry-context.h"
+#include "foundry-code-fold-provider.h"
 #include "foundry-debug.h"
 #include "foundry-diagnostic-manager.h"
 #include "foundry-extension-set-private.h"
+#include "foundry-extension.h"
 #include "foundry-file-manager.h"
 #include "foundry-on-type-diagnostics.h"
 #include "foundry-operation.h"
@@ -61,6 +63,7 @@ struct _FoundryTextDocument
   char                *draft_id;
   PeasExtensionSet    *addins;
   FoundryExtensionSet *symbol_providers;
+  FoundryExtension    *code_fold_provider;
   DexPromise          *changed;
   DexFuture           *settings;
 };
@@ -69,6 +72,7 @@ enum {
   PROP_0,
   PROP_ADDINS,
   PROP_BUFFER,
+  PROP_CODE_FOLD_PROVIDER,
   PROP_DRAFT_ID,
   PROP_ICON,
   PROP_FILE,
@@ -85,6 +89,16 @@ G_DEFINE_FINAL_TYPE (FoundryTextDocument, foundry_text_document, FOUNDRY_TYPE_CO
 
 static GParamSpec *properties[N_PROPS];
 static guint signals[N_SIGNALS];
+
+static void
+foundry_text_document_fold_provider_changed (FoundryExtension    *extension,
+                                              GParamSpec          *pspec,
+                                              FoundryTextDocument *self)
+{
+  g_assert (FOUNDRY_IS_TEXT_DOCUMENT (self));
+
+  g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_CODE_FOLD_PROVIDER]);
+}
 
 static DexFuture *
 foundry_text_document_update_icon_cb (DexFuture *completed,
@@ -211,6 +225,24 @@ foundry_text_document_new_fiber (FoundryContext     *context,
 
   _foundry_text_buffer_register (buffer, self);
 
+  {
+    g_autofree char *language_id = foundry_text_buffer_dup_language_id (buffer);
+
+    self->code_fold_provider = foundry_extension_new (context,
+                                                      peas_engine_get_default (),
+                                                      FOUNDRY_TYPE_CODE_FOLD_PROVIDER,
+                                                      "Code-Fold-Provider-Languages",
+                                                      language_id);
+    g_object_bind_property (buffer, "language-id",
+                            self->code_fold_provider, "value",
+                            G_BINDING_SYNC_CREATE);
+    g_signal_connect_object (self->code_fold_provider,
+                             "notify::extension",
+                             G_CALLBACK (foundry_text_document_fold_provider_changed),
+                             self,
+                             0);
+  }
+
   n_items = g_list_model_get_n_items (G_LIST_MODEL (self->addins));
   futures = g_ptr_array_new_with_free_func (dex_unref);
 
@@ -274,6 +306,7 @@ foundry_text_document_dispose (GObject *object)
   dex_clear (&self->settings);
 
   g_clear_object (&self->symbol_providers);
+  g_clear_object (&self->code_fold_provider);
   g_clear_object (&self->addins);
 
   G_OBJECT_CLASS (foundry_text_document_parent_class)->dispose (object);
@@ -313,6 +346,10 @@ foundry_text_document_get_property (GObject    *object,
 
     case PROP_BUFFER:
       g_value_take_object (value, foundry_text_document_dup_buffer (self));
+      break;
+
+    case PROP_CODE_FOLD_PROVIDER:
+      g_value_take_object (value, foundry_text_document_dup_code_fold_provider (self));
       break;
 
     case PROP_DRAFT_ID:
@@ -386,6 +423,19 @@ foundry_text_document_class_init (FoundryTextDocumentClass *klass)
                           G_PARAM_CONSTRUCT_ONLY |
                           G_PARAM_STATIC_STRINGS));
 
+  /**
+   * FoundryTextDocument:code-fold-provider:
+   *
+   * The provider selected for the current language.
+   *
+   * Since: 1.3
+   */
+  properties[PROP_CODE_FOLD_PROVIDER] =
+    g_param_spec_object ("code-fold-provider", NULL, NULL,
+                         FOUNDRY_TYPE_CODE_FOLD_PROVIDER,
+                         (G_PARAM_READABLE |
+                          G_PARAM_STATIC_STRINGS));
+
   properties[PROP_DRAFT_ID] =
     g_param_spec_string ("draft-id", NULL, NULL,
                          NULL,
@@ -438,6 +488,51 @@ foundry_text_document_init (FoundryTextDocument *self)
 {
   g_weak_ref_init (&self->text_manager_wr, NULL);
   g_weak_ref_init (&self->on_type_diagnostics_wr, NULL);
+}
+
+/**
+ * foundry_text_document_dup_code_fold_provider:
+ * @self: a text document
+ *
+ * Returns: (transfer full) (nullable): the selected provider
+ * Since: 1.3
+ */
+FoundryCodeFoldProvider *
+foundry_text_document_dup_code_fold_provider (FoundryTextDocument *self)
+{
+  FoundryCodeFoldProvider *provider;
+
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self), NULL);
+
+  if (self->code_fold_provider == NULL)
+    return NULL;
+
+  provider = foundry_extension_get_extension (self->code_fold_provider);
+  return provider ? g_object_ref (provider) : NULL;
+}
+
+/**
+ * foundry_text_document_list_code_folds:
+ * @self: a text document
+ *
+ * Returns: (transfer full): a future resolving to a complete fold model
+ * Since: 1.3
+ */
+DexFuture *
+foundry_text_document_list_code_folds (FoundryTextDocument *self)
+{
+  g_autoptr(FoundryCodeFoldProvider) provider = NULL;
+  g_autoptr(GBytes) contents = NULL;
+
+  dex_return_error_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (self));
+
+  if (!(provider = foundry_text_document_dup_code_fold_provider (self)))
+    return dex_future_new_reject (G_IO_ERROR,
+                                  G_IO_ERROR_NOT_SUPPORTED,
+                                  "No code fold provider is available");
+
+  contents = foundry_text_buffer_dup_contents (self->buffer);
+  return foundry_code_fold_provider_list_folds (provider, self, contents);
 }
 
 /**
