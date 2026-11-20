@@ -42,6 +42,24 @@ foundry_text_iter_get_offset (const FoundryTextIter *iter)
   return iter->vtable->get_offset (iter);
 }
 
+/**
+ * foundry_text_iter_get_char:
+ * @iter: a text iterator
+ *
+ * Gets the character at @iter.
+ *
+ * Returns: the Unicode character at @iter, or 0 at the end of the buffer
+ * Since: 1.3
+ */
+gunichar
+foundry_text_iter_get_char (const FoundryTextIter *iter)
+{
+  g_return_val_if_fail (iter != NULL, 0);
+  g_return_val_if_fail (iter->vtable != NULL, 0);
+
+  return iter->vtable->get_char (iter);
+}
+
 gsize
 foundry_text_iter_get_line (const FoundryTextIter *iter)
 {
