@@ -118,6 +118,30 @@ foundry_text_buffer_ref_documents (FoundryTextBuffer *self)
   return g_ptr_array_ref (ar);
 }
 
+/**
+ * _foundry_text_buffer_dup_document:
+ * @self: a [iface@Foundry.TextBuffer]
+ *
+ * Gets the document registered with @self. If no document or more than one
+ * document is registered, %NULL is returned.
+ *
+ * Returns: (transfer full) (nullable): the document, or %NULL
+ */
+FoundryTextDocument *
+_foundry_text_buffer_dup_document (FoundryTextBuffer *self)
+{
+  GPtrArray *documents;
+
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_BUFFER (self), NULL);
+
+  documents = g_object_get_data (G_OBJECT (self), FOUNDRY_TEXT_DOCUMENTS_KEY);
+
+  if (documents == NULL || documents->len != 1)
+    return NULL;
+
+  return g_object_ref (documents->pdata[0]);
+}
+
 void
 _foundry_text_buffer_register (FoundryTextBuffer   *self,
                                FoundryTextDocument *document)

@@ -25,9 +25,11 @@
 
 G_BEGIN_DECLS
 
-void _foundry_text_buffer_register   (FoundryTextBuffer   *self,
-                                      FoundryTextDocument *document);
-void _foundry_text_buffer_unregister (FoundryTextBuffer   *self,
-                                      FoundryTextDocument *document);
+_FOUNDRY_EXTERN
+FoundryTextDocument *_foundry_text_buffer_dup_document (FoundryTextBuffer   *self);
+void                 _foundry_text_buffer_register     (FoundryTextBuffer   *self,
+                                                        FoundryTextDocument *document);
+void                 _foundry_text_buffer_unregister   (FoundryTextBuffer   *self,
+                                                        FoundryTextDocument *document);
 
 G_END_DECLS
