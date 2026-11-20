@@ -47,7 +47,8 @@ struct _FoundrySimpleTextBuffer
   guint           stamp;
 };
 
-enum {
+enum
+{
   PROP_0,
   PROP_CONTEXT,
   PROP_LANGUAGE_ID,
@@ -208,6 +209,7 @@ order (gsize *a,
   if (*a > *b)
     {
       gsize tmp = *a;
+
       *a = *b;
       *b = tmp;
     }
@@ -267,8 +269,10 @@ foundry_simple_text_buffer_apply_edit (FoundryTextBuffer *text_editor,
   g_assert (FOUNDRY_IS_TEXT_EDIT (edit));
 
   foundry_text_edit_get_range (edit,
-                               &begin_line, &begin_line_offset,
-                               &end_line, &end_line_offset);
+                               &begin_line,
+                               &begin_line_offset,
+                               &end_line,
+                               &end_line_offset);
 
   foundry_simple_text_buffer_get_offset_at (self, &begin, begin_line, begin_line_offset);
   foundry_simple_text_buffer_get_offset_at (self, &end, end_line, end_line_offset);
@@ -402,7 +406,7 @@ foundry_simple_text_iter_forward_char (FoundryTextIter *iter)
   simple->offset++;
   simple->ptr = g_utf8_next_char (simple->ptr);
 
-  return foundry_simple_text_iter_is_end (iter);
+  return TRUE;
 }
 
 static gboolean
@@ -439,6 +443,7 @@ foundry_simple_text_iter_backward_char (FoundryTextIter *iter)
           if (simple->ptr == bounds)
             {
               g_assert (simple->line == 0);
+
               simple->line_offset = 0;
               return TRUE;
             }
@@ -459,6 +464,10 @@ foundry_simple_text_iter_backward_char (FoundryTextIter *iter)
       while (ptr > bounds);
 
       simple->line_offset = g_utf8_strlen (ptr, simple->ptr - ptr);
+    }
+  else
+    {
+      simple->line_offset--;
     }
 
   return TRUE;
@@ -546,7 +555,8 @@ foundry_simple_text_iter_move_to_line_and_offset (FoundryTextIter *iter,
   g_return_val_if_fail (foundry_simple_text_iter_check (iter), 0);
 
   if (simple->line > line ||
-      (simple->line == line && simple->line_offset > line_offset))
+      (simple->line == line &&
+       simple->line_offset > line_offset))
     foundry_simple_text_iter_reset (iter);
 
   while (simple->line < line)
@@ -667,5 +677,6 @@ foundry_simple_text_buffer_set_language_id (FoundrySimpleTextBuffer *self,
 {
   g_return_if_fail (FOUNDRY_IS_SIMPLE_TEXT_BUFFER (self));
 
-  g_set_str (&self->language_id, language_id);
+  if (g_set_str (&self->language_id, language_id))
+    g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_LANGUAGE_ID]);
 }
