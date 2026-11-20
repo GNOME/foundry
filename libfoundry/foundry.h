@@ -334,6 +334,8 @@
 # include "foundry-on-type-diagnostics.h"
 # include "foundry-on-type-formatter.h"
 # include "foundry-rename-provider.h"
+# include "foundry-code-fold.h"
+# include "foundry-code-fold-provider.h"
 # include "foundry-simple-text-buffer.h"
 # include "foundry-text-buffer.h"
 # include "foundry-text-buffer-provider.h"

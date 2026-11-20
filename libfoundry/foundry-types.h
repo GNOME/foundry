@@ -164,6 +164,8 @@ typedef struct _FoundrySdkProvider               FoundrySdkProvider;
 typedef struct _FoundrySecretService             FoundrySecretService;
 typedef struct _FoundrySettings                  FoundrySettings;
 typedef struct _FoundrySymbol                    FoundrySymbol;
+typedef struct _FoundryCodeFold                  FoundryCodeFold;
+typedef struct _FoundryCodeFoldProvider          FoundryCodeFoldProvider;
 typedef struct _FoundrySymbolIntent              FoundrySymbolIntent;
 typedef struct _FoundrySymbolLocator             FoundrySymbolLocator;
 typedef struct _FoundrySymbolProvider            FoundrySymbolProvider;
