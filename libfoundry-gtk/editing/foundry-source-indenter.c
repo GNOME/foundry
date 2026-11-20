@@ -95,8 +95,7 @@ foundry_source_indenter_indent (GtkSourceIndenter *indenter,
 
   foundry_on_type_formatter_indent (self->formatter, document, &real);
 
-  gtk_text_iter_set_line (iter, foundry_text_iter_get_line (&real));
-  gtk_text_iter_set_line_offset (iter, foundry_text_iter_get_line_offset (&real));
+  gtk_text_buffer_get_iter_at_offset (buffer, iter, foundry_text_iter_get_offset (&real));
 }
 
 static void
