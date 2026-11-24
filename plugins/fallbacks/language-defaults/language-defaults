@@ -7,6 +7,7 @@ implicit-trailing-newline = true
 insert-spaces-instead-of-tabs = true
 tab-width = 8
 indent-width = 2
+override-indent-width = true
 auto-indent = true
 insert-matching-brace = true
 implicit-trailing-newline = true
@@ -17,6 +18,18 @@ spaces-style = before-left-paren;
 insert-spaces-instead-of-tabs = true
 tab-width = 8
 indent-width = 2
+override-indent-width = true
+auto-indent = true
+insert-matching-brace = true
+implicit-trailing-newline = true
+overwrite-matching-brace = true
+spaces-style = before-left-paren;
+
+[objc]
+insert-spaces-instead-of-tabs = true
+tab-width = 8
+indent-width = 2
+override-indent-width = true
 auto-indent = true
 insert-matching-brace = true
 implicit-trailing-newline = true
