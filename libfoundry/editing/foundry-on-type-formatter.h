@@ -46,30 +46,39 @@ struct _FoundryOnTypeFormatterClass
 {
   GObjectClass parent_class;
 
-  gboolean (*is_trigger) (FoundryOnTypeFormatter *self,
-                          FoundryTextDocument    *document,
-                          const FoundryTextIter  *iter,
-                          FoundryModifierType     state,
-                          guint                   keyval);
-  void     (*indent)     (FoundryOnTypeFormatter *self,
-                          FoundryTextDocument    *document,
-                          FoundryTextIter        *iter);
+  gboolean (*is_trigger)           (FoundryOnTypeFormatter *self,
+                                    FoundryTextDocument    *document,
+                                    const FoundryTextIter  *iter,
+                                    FoundryModifierType     state,
+                                    guint                   keyval);
+  void     (*indent)               (FoundryOnTypeFormatter *self,
+                                    FoundryTextDocument    *document,
+                                    FoundryTextIter        *iter);
+  void     (*indent_with_settings) (FoundryOnTypeFormatter *self,
+                                    FoundryTextDocument    *document,
+                                    FoundryTextIter        *iter,
+                                    FoundryTextSettings    *settings);
 
   /*< private >*/
-  gpointer _reserved[13];
+  gpointer _reserved[12];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
-GType    foundry_modifier_type_get_type       (void) G_GNUC_CONST;
+GType    foundry_modifier_type_get_type                 (void);
 FOUNDRY_AVAILABLE_IN_ALL
-gboolean foundry_on_type_formatter_is_trigger (FoundryOnTypeFormatter *self,
-                                               FoundryTextDocument    *document,
-                                               const FoundryTextIter  *iter,
-                                               FoundryModifierType     state,
-                                               guint                   keyval);
+gboolean foundry_on_type_formatter_is_trigger           (FoundryOnTypeFormatter *self,
+                                                         FoundryTextDocument    *document,
+                                                         const FoundryTextIter  *iter,
+                                                         FoundryModifierType     state,
+                                                         guint                   keyval);
 FOUNDRY_AVAILABLE_IN_ALL
-void     foundry_on_type_formatter_indent     (FoundryOnTypeFormatter *self,
-                                               FoundryTextDocument    *document,
-                                               FoundryTextIter        *iter);
+void     foundry_on_type_formatter_indent               (FoundryOnTypeFormatter *self,
+                                                         FoundryTextDocument    *document,
+                                                         FoundryTextIter        *iter);
+FOUNDRY_AVAILABLE_IN_1_3
+void     foundry_on_type_formatter_indent_with_settings (FoundryOnTypeFormatter *self,
+                                                         FoundryTextDocument    *document,
+                                                         FoundryTextIter        *iter,
+                                                         FoundryTextSettings    *settings);
 
 G_END_DECLS

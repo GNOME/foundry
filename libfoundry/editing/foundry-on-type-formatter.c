@@ -21,6 +21,7 @@
 #include "config.h"
 
 #include "foundry-text-document.h"
+#include "foundry-text-settings.h"
 #include "foundry-on-type-formatter.h"
 
 /**
@@ -78,10 +79,35 @@ foundry_on_type_formatter_indent (FoundryOnTypeFormatter *self,
   FOUNDRY_ON_TYPE_FORMATTER_GET_CLASS (self)->indent (self, document, iter);
 }
 
+/**
+ * foundry_on_type_formatter_indent_with_settings:
+ * @self: a [class@Foundry.OnTypeFormatter]
+ * @document: the document being edited
+ * @iter: (inout): the cursor location after the typed character
+ * @settings: the document's loaded text settings
+ *
+ * Indents at @iter using the document's text settings.
+ */
+void
+foundry_on_type_formatter_indent_with_settings (FoundryOnTypeFormatter *self,
+                                                FoundryTextDocument    *document,
+                                                FoundryTextIter        *iter,
+                                                FoundryTextSettings    *settings)
+{
+  g_return_if_fail (FOUNDRY_IS_ON_TYPE_FORMATTER (self));
+  g_return_if_fail (FOUNDRY_IS_TEXT_DOCUMENT (document));
+  g_return_if_fail (iter != NULL);
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (settings));
+
+  if (FOUNDRY_ON_TYPE_FORMATTER_GET_CLASS (self)->indent_with_settings)
+    FOUNDRY_ON_TYPE_FORMATTER_GET_CLASS (self)->indent_with_settings (self, document, iter, settings);
+  else
+    foundry_on_type_formatter_indent (self, document, iter);
+}
+
 G_DEFINE_FLAGS_TYPE (FoundryModifierType, foundry_modifier_type,
                      G_DEFINE_ENUM_VALUE (FOUNDRY_MODIFIER_CONTROL, "control"),
                      G_DEFINE_ENUM_VALUE (FOUNDRY_MODIFIER_SHIFT, "shift"),
                      G_DEFINE_ENUM_VALUE (FOUNDRY_MODIFIER_ALT, "alt"),
                      G_DEFINE_ENUM_VALUE (FOUNDRY_MODIFIER_SUPER, "super"),
                      G_DEFINE_ENUM_VALUE (FOUNDRY_MODIFIER_COMMAND, "command"))
-
