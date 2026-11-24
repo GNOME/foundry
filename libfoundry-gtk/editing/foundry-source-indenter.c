@@ -80,6 +80,7 @@ foundry_source_indenter_indent (GtkSourceIndenter *indenter,
 {
   FoundrySourceIndenter *self = (FoundrySourceIndenter *)indenter;
   g_autoptr(FoundryTextDocument) document = NULL;
+  g_autoptr(FoundryTextSettings) settings = NULL;
   GtkTextBuffer *buffer;
   FoundryTextIter real;
 
@@ -87,13 +88,20 @@ foundry_source_indenter_indent (GtkSourceIndenter *indenter,
   g_assert (FOUNDRY_IS_SOURCE_VIEW (view));
 
   document = foundry_source_view_dup_document (FOUNDRY_SOURCE_VIEW (view));
+  settings = foundry_source_view_dup_settings (FOUNDRY_SOURCE_VIEW (view));
   buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
 
   g_assert (FOUNDRY_IS_SOURCE_BUFFER (buffer));
 
   _foundry_source_buffer_init_iter (FOUNDRY_SOURCE_BUFFER (buffer), &real, iter);
 
-  foundry_on_type_formatter_indent (self->formatter, document, &real);
+  if (settings != NULL)
+    foundry_on_type_formatter_indent_with_settings (self->formatter,
+                                                    document,
+                                                    &real,
+                                                    settings);
+  else
+    foundry_on_type_formatter_indent (self->formatter, document, &real);
 
   gtk_text_buffer_get_iter_at_offset (buffer, iter, foundry_text_iter_get_offset (&real));
 }
