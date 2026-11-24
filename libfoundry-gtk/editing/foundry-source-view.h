@@ -34,6 +34,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 GtkWidget            *foundry_source_view_new                            (FoundryTextDocument        *document);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryTextDocument  *foundry_source_view_dup_document                   (FoundrySourceView          *self);
+FOUNDRY_AVAILABLE_IN_1_3
+FoundryTextSettings  *foundry_source_view_dup_settings                   (FoundrySourceView          *self);
 FOUNDRY_AVAILABLE_IN_ALL
 FoundryContext       *foundry_source_view_dup_context                    (FoundrySourceView          *self);
 FOUNDRY_AVAILABLE_IN_ALL

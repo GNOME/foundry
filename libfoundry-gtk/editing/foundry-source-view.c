@@ -1011,6 +1011,22 @@ foundry_source_view_dup_document (FoundrySourceView *self)
 }
 
 /**
+ * foundry_source_view_dup_settings:
+ * @self: a [class@FoundryGtk.SourceView]
+ *
+ * Returns the loaded text settings for the view.
+ *
+ * Returns: (transfer full) (nullable): the view's text settings
+ */
+FoundryTextSettings *
+foundry_source_view_dup_settings (FoundrySourceView *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_SOURCE_VIEW (self), NULL);
+
+  return self->settings ? g_object_ref (self->settings) : NULL;
+}
+
+/**
  * foundry_source_view_rename:
  * @self: a [class@FoundryGtk.SourceView]
  * @iter: the location of the semantic word to rename
