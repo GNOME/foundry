@@ -1231,8 +1231,6 @@ foundry_text_settings_set_indent_width (FoundryTextSettings *self,
   g_return_if_fail (indent_width > 0);
   g_return_if_fail (indent_width <= 32);
 
-  indent_width = !!indent_width;
-
   if (indent_width != self->indent_width)
     {
       self->indent_width = indent_width;
