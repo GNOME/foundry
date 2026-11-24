@@ -220,7 +220,10 @@ plugin_word_completion_results_class_init (PluginWordCompletionResultsClass *kla
   object_class->finalize = plugin_word_completion_results_finalize;
 
   regex = g_regex_new ("\\w+", G_REGEX_OPTIMIZE, G_REGEX_MATCH_DEFAULT, NULL);
-  include_regex = g_regex_new ("^\\s*#\\s*(include|import)\\s*[\"<.]+(.+)[\">]\\s*$", G_REGEX_OPTIMIZE, G_REGEX_MATCH_DEFAULT, NULL);
+  include_regex = g_regex_new ("^\\s*#\\s*(?:include|import)\\s*[\"<]([^\">]+)[\">]\\s*$",
+                               G_REGEX_OPTIMIZE,
+                               G_REGEX_MATCH_DEFAULT,
+                               NULL);
 }
 
 static void
@@ -294,19 +297,26 @@ plugin_word_completion_results_mine (PluginWordCompletionResults *self,
           if (g_regex_match_full (include_regex, line, line_len, 0, G_REGEX_MATCH_DEFAULT, &include_matches, NULL) &&
               g_match_info_matches (include_matches))
             {
-              g_autofree char *word = g_match_info_fetch (include_matches, 2);
+              g_autofree char *word = g_match_info_fetch (include_matches, 1);
 
               if (!foundry_str_empty0 (word))
                 {
                   g_autoptr(GFile) child = NULL;
                   g_autoptr(GBytes) child_bytes = NULL;
 
-                  if (dir == NULL)
-                    dir = g_file_get_parent (file);
+                  if (g_path_is_absolute (word))
+                    child = g_file_new_for_path (word);
+                  else
+                    {
+                      if (dir == NULL)
+                        dir = g_file_get_parent (file);
 
-                  child = g_file_get_child (dir, word);
+                      if (dir != NULL)
+                        child = g_file_resolve_relative_path (dir, word);
+                    }
 
-                  if (!g_hash_table_contains (self->seen_files, child) &&
+                  if (child != NULL &&
+                      !g_hash_table_contains (self->seen_files, child) &&
                       (child_bytes = dex_await_boxed (dex_file_load_contents_bytes (child), NULL)))
                     {
                       g_hash_table_insert (self->seen_files, g_object_ref (child), NULL);
