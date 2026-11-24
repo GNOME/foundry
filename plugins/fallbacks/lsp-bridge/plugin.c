@@ -22,10 +22,12 @@
 
 #include <foundry.h>
 
+#include "plugin-lsp-bridge-code-fold-provider.h"
 #include "plugin-lsp-bridge-diagnostic-provider.h"
 #include "plugin-lsp-bridge-symbol-provider.h"
 
 FOUNDRY_PLUGIN_DEFINE (_plugin_lsp_bridge_register_types,
+                       FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_CODE_FOLD_PROVIDER, PLUGIN_TYPE_LSP_BRIDGE_CODE_FOLD_PROVIDER)
                        FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_DIAGNOSTIC_PROVIDER, PLUGIN_TYPE_LSP_BRIDGE_DIAGNOSTIC_PROVIDER)
                        FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_COMPLETION_PROVIDER, FOUNDRY_TYPE_LSP_COMPLETION_PROVIDER)
                        FOUNDRY_PLUGIN_REGISTER_TYPE (FOUNDRY_TYPE_SYMBOL_PROVIDER, PLUGIN_TYPE_LSP_BRIDGE_SYMBOL_PROVIDER))
