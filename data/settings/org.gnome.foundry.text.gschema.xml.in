@@ -53,6 +53,11 @@
       <summary>Highlight matching brackets</summary>
       <description>If enabled, the editor will highlight matching brackets.</description>
     </key>
+    <key name="trim-trailing-whitespace" type="b">
+      <default>true</default>
+      <summary>Trim trailing whitespace</summary>
+      <description>Remove trailing spaces and tabs from changed lines when saving.</description>
+    </key>
     <key name="implicit-trailing-newline" type="b">
       <default>true</default>
       <summary>Implicit Trailing Newline</summary>

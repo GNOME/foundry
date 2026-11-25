@@ -232,6 +232,7 @@ plugin_modelines_settings_provider_get_setting (FoundryTextSettingsProvider *pro
   switch (setting)
     {
     default:
+    case FOUNDRY_TEXT_SETTING_TRIM_TRAILING_WHITESPACE:
     case FOUNDRY_TEXT_SETTING_NONE:
       return FALSE;
 

@@ -61,6 +61,7 @@ struct _FoundryTextSettings
   guint enable_spell_check : 1;
   guint highlight_current_line : 1;
   guint highlight_matching_brackets : 1;
+  guint trim_trailing_whitespace : 1;
   guint implicit_trailing_newline : 1;
   guint indent_on_tab : 1;
   guint insert_matching_brace : 1;
@@ -86,6 +87,7 @@ struct _FoundryTextSettings
   guint enable_spell_check_set : 1;
   guint highlight_current_line_set : 1;
   guint highlight_matching_brackets_set : 1;
+  guint trim_trailing_whitespace_set : 1;
   guint implicit_trailing_newline_set : 1;
   guint indent_on_tab_set : 1;
   guint indent_width_set : 1;
@@ -121,6 +123,7 @@ enum {
   PROP_ENABLE_SPELL_CHECK,
   PROP_HIGHLIGHT_CURRENT_LINE,
   PROP_HIGHLIGHT_MATCHING_BRACKETS,
+  PROP_TRIM_TRAILING_WHITESPACE,
   PROP_IMPLICIT_TRAILING_NEWLINE,
   PROP_INDENT_ON_TAB,
   PROP_INDENT_WIDTH,
@@ -298,6 +301,9 @@ setting_to_param_spec (FoundryTextSetting setting)
     case FOUNDRY_TEXT_SETTING_HIGHLIGHT_MATCHING_BRACKETS:
       return properties[PROP_HIGHLIGHT_MATCHING_BRACKETS];
 
+    case FOUNDRY_TEXT_SETTING_TRIM_TRAILING_WHITESPACE:
+      return properties[PROP_TRIM_TRAILING_WHITESPACE];
+
     case FOUNDRY_TEXT_SETTING_IMPLICIT_TRAILING_NEWLINE:
       return properties[PROP_IMPLICIT_TRAILING_NEWLINE];
 
@@ -450,6 +456,10 @@ foundry_text_settings_get_property (GObject    *object,
       g_value_set_boolean (value, foundry_text_settings_get_highlight_matching_brackets (self));
       break;
 
+    case PROP_TRIM_TRAILING_WHITESPACE:
+      g_value_set_boolean (value, foundry_text_settings_get_trim_trailing_whitespace (self));
+      break;
+
     case PROP_IMPLICIT_TRAILING_NEWLINE:
       g_value_set_boolean (value, foundry_text_settings_get_implicit_trailing_newline (self));
       break;
@@ -579,6 +589,10 @@ foundry_text_settings_set_property (GObject      *object,
 
     case PROP_HIGHLIGHT_MATCHING_BRACKETS:
       foundry_text_settings_set_highlight_matching_brackets (self, g_value_get_boolean (value));
+      break;
+
+    case PROP_TRIM_TRAILING_WHITESPACE:
+      foundry_text_settings_set_trim_trailing_whitespace (self, g_value_get_boolean (value));
       break;
 
     case PROP_IMPLICIT_TRAILING_NEWLINE:
@@ -727,6 +741,13 @@ foundry_text_settings_class_init (FoundryTextSettingsClass *klass)
 
   properties[PROP_HIGHLIGHT_MATCHING_BRACKETS] =
     g_param_spec_boolean ("highlight-matching-brackets", NULL, NULL,
+                          TRUE,
+                          (G_PARAM_READWRITE |
+                           G_PARAM_EXPLICIT_NOTIFY |
+                           G_PARAM_STATIC_STRINGS));
+
+  properties[PROP_TRIM_TRAILING_WHITESPACE] =
+    g_param_spec_boolean ("trim-trailing-whitespace", NULL, NULL,
                           TRUE,
                           (G_PARAM_READWRITE |
                            G_PARAM_EXPLICIT_NOTIFY |
@@ -1155,6 +1176,47 @@ foundry_text_settings_set_highlight_matching_brackets (FoundryTextSettings *self
       self->highlight_matching_brackets = highlight_matching_brackets;
       self->highlight_matching_brackets_set = TRUE;
       g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_HIGHLIGHT_MATCHING_BRACKETS]);
+    }
+}
+
+/**
+ * foundry_text_settings_get_trim_trailing_whitespace:
+ * @self: a [class@Foundry.TextSettings]
+ *
+ * Returns: whether saving trims trailing spaces and tabs from changed lines
+ */
+gboolean
+foundry_text_settings_get_trim_trailing_whitespace (FoundryTextSettings *self)
+{
+  g_return_val_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self), FALSE);
+
+  if (self->trim_trailing_whitespace_set)
+    return self->trim_trailing_whitespace;
+
+  return get_boolean (self, FOUNDRY_TEXT_SETTING_TRIM_TRAILING_WHITESPACE, PROP_TRIM_TRAILING_WHITESPACE);
+}
+
+/**
+ * foundry_text_settings_set_trim_trailing_whitespace:
+ * @self: a [class@Foundry.TextSettings]
+ * @trim_trailing_whitespace: whether to trim changed lines when saving
+ *
+ * Overrides the document preference for trimming trailing whitespace.
+ */
+void
+foundry_text_settings_set_trim_trailing_whitespace (FoundryTextSettings *self,
+                                                    gboolean             trim_trailing_whitespace)
+{
+  g_return_if_fail (FOUNDRY_IS_TEXT_SETTINGS (self));
+
+  trim_trailing_whitespace = !!trim_trailing_whitespace;
+
+  if (!self->trim_trailing_whitespace_set ||
+      trim_trailing_whitespace != self->trim_trailing_whitespace)
+    {
+      self->trim_trailing_whitespace = trim_trailing_whitespace;
+      self->trim_trailing_whitespace_set = TRUE;
+      g_object_notify_by_pspec (G_OBJECT (self), properties[PROP_TRIM_TRAILING_WHITESPACE]);
     }
 }
 

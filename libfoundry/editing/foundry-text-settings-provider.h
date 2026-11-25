@@ -60,10 +60,11 @@ typedef enum _FoundryTextSetting
   FOUNDRY_TEXT_SETTING_TAB_WIDTH,
   FOUNDRY_TEXT_SETTING_USE_CUSTOM_FONT,
   FOUNDRY_TEXT_SETTING_WRAP,
+  FOUNDRY_TEXT_SETTING_TRIM_TRAILING_WHITESPACE,
 } FoundryTextSetting;
 
 /* Not part of ABI */
-#define FOUNDRY_TEXT_SETTING_LAST (FOUNDRY_TEXT_SETTING_WRAP+1)
+#define FOUNDRY_TEXT_SETTING_LAST (FOUNDRY_TEXT_SETTING_TRIM_TRAILING_WHITESPACE+1)
 
 typedef enum _FoundryTextWrap
 {
@@ -105,7 +106,7 @@ FOUNDRY_AVAILABLE_IN_ALL
 FoundryTextDocument *foundry_text_settings_provider_dup_document    (FoundryTextSettingsProvider *self);
 FOUNDRY_AVAILABLE_IN_ALL
 void                 foundry_text_settings_provider_emit_changed    (FoundryTextSettingsProvider *self,
-                                                                    FoundryTextSetting           setting);
+                                                                     FoundryTextSetting           setting);
 FOUNDRY_AVAILABLE_IN_ALL
 gboolean             foundry_text_settings_provider_get_setting     (FoundryTextSettingsProvider *self,
                                                                      FoundryTextSetting           setting,

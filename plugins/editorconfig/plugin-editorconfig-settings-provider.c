@@ -61,6 +61,10 @@ plugin_editorconfig_settings_provider_get_setting (FoundryTextSettingsProvider *
       src = g_hash_table_lookup (self->ht, "tab_width");
       break;
 
+    case FOUNDRY_TEXT_SETTING_TRIM_TRAILING_WHITESPACE:
+      src = g_hash_table_lookup (self->ht, "trim_trailing_whitespace");
+      break;
+
     case FOUNDRY_TEXT_SETTING_IMPLICIT_TRAILING_NEWLINE:
       src = g_hash_table_lookup (self->ht, "insert_final_newline");
       break;

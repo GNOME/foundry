@@ -170,5 +170,10 @@ FoundryTextWrap  foundry_text_settings_get_wrap                          (Foundr
 FOUNDRY_AVAILABLE_IN_ALL
 void             foundry_text_settings_set_wrap                          (FoundryTextSettings *self,
                                                                           FoundryTextWrap      wrap);
+FOUNDRY_AVAILABLE_IN_1_3
+gboolean         foundry_text_settings_get_trim_trailing_whitespace      (FoundryTextSettings *self);
+FOUNDRY_AVAILABLE_IN_1_3
+void             foundry_text_settings_set_trim_trailing_whitespace      (FoundryTextSettings *self,
+                                                                          gboolean             trim_trailing_whitespace);
 
 G_END_DECLS
