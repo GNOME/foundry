@@ -1836,17 +1836,18 @@ foundry_git_repository_describe_line_changes_fiber (gpointer data)
   git_diff_options_init (&options, GIT_DIFF_OPTIONS_VERSION);
   options.context_lines = 0;
 
-  git_diff_blob_to_buffer (blob,
-                           path,
-                           g_bytes_get_data (state->contents, NULL),
-                           g_bytes_get_size (state->contents),
-                           path,
-                           &options,
-                           NULL,         /* File Callback */
-                           NULL,         /* Binary Callback */
-                           diff_hunk_cb, /* Hunk Callback */
-                           NULL,
-                           ranges);
+  if (git_diff_blob_to_buffer (blob,
+                               path,
+                               g_bytes_get_data (state->contents, NULL),
+                               g_bytes_get_size (state->contents),
+                               path,
+                               &options,
+                               NULL,         /* File Callback */
+                               NULL,         /* Binary Callback */
+                               diff_hunk_cb, /* Hunk Callback */
+                               NULL,
+                               ranges) != 0)
+    return foundry_git_reject_last_error ();
 
   cache = line_cache_new ();
 
