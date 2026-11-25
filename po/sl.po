@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: foundry main\n"
 "Report-Msgid-Bugs-To: https://gitlab.gnome.org/GNOME/foundry/issues\n"
-"POT-Creation-Date: 2026-08-02 07:15+0000\n"
-"PO-Revision-Date: 2026-08-04 12:46+0200\n"
+"POT-Creation-Date: 2026-11-25 15:45+0000\n"
+"PO-Revision-Date: 2026-11-25 20:32+0100\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenian <Slovenian>\n"
 "Language: sl\n"
@@ -1614,7 +1614,7 @@ msgid "Commands"
 msgstr "Ukazi"
 
 #: libfoundry/cli/foundry-cli-command-tree.c:889
-#: libfoundry/cli/foundry-cli-command-tree.c:988
+#: libfoundry/cli/foundry-cli-command-tree.c:992
 #, c-format
 msgid "No such command"
 msgstr "Takšen ukaz ne obstaja"
@@ -1630,12 +1630,12 @@ msgid "Unknown command “%s” for “%s”"
 msgstr "Neznan ukaz »%s« za »%s«"
 
 #: libfoundry/cli/foundry-cli-command-tree.c:918
-#: libfoundry/cli/foundry-cli-command.c:558
+#: libfoundry/cli/foundry-cli-command.c:588
 msgid "Usage"
 msgstr "Raba"
 
 #: libfoundry/cli/foundry-cli-command-tree.c:921
-#: libfoundry/cli/foundry-cli-command.c:558
+#: libfoundry/cli/foundry-cli-command.c:588
 msgid "OPTIONS"
 msgstr "MOŽNOSTI"
 
@@ -1643,11 +1643,11 @@ msgstr "MOŽNOSTI"
 msgid "COMMAND"
 msgstr "UKAZ"
 
-#: libfoundry/cli/foundry-command-line.c:553
+#: libfoundry/cli/foundry-command-line.c:554
 msgid "Yes"
 msgstr "Da"
 
-#: libfoundry/cli/foundry-command-line.c:555
+#: libfoundry/cli/foundry-command-line.c:556
 msgid "No"
 msgstr "Ne"
 
@@ -1657,7 +1657,7 @@ msgid "My Computer"
 msgstr "Moj računalnik"
 
 #. translators: %s is replaced with project title
-#: libfoundry/foundry-context.c:1081
+#: libfoundry/foundry-context.c:1272
 #, c-format
 msgid "Project “%s” loaded"
 msgstr "Projekt »%s« je naložen"
@@ -1668,7 +1668,7 @@ msgstr "Projekt »%s« je naložen"
 msgid "Projects"
 msgstr "Projekti"
 
-#: libfoundry/foundry-util.c:1389
+#: libfoundry/foundry-util.c:1395
 msgid "Building project"
 msgstr "Poteka izgradnja projekta"
 
@@ -1792,7 +1792,7 @@ msgid "View in %s"
 msgstr "Pokaži v %s"
 
 #. Note to the user we're importing this book
-#: plugins/devhelp/plugin-devhelp-importer.c:700
+#: plugins/devhelp/plugin-devhelp-importer.c:669
 #, c-format
 msgid "Importing %s…"
 msgstr "Uvažanje %s …"
@@ -1865,7 +1865,12 @@ msgstr "Preizkusna"
 msgid "Documentation for the GNOME %s SDK"
 msgstr "Dokumentacija za SDK GNOME %s"
 
-#: plugins/fallbacks/flatpak/plugin-flatpak-download-stage.c:273
+#: plugins/fallbacks/flatpak/plugin-flatpak-download-stage.c:119
+msgid "Skipping Flatpak source downloads on a metered connection."
+msgstr ""
+"Preskakovanje prenosov izvorne kode Flatpak na povezavi z omejenim prometom."
+
+#: plugins/fallbacks/flatpak/plugin-flatpak-download-stage.c:279
 msgid "Download Flatpak Dependencies"
 msgstr "Prejmi odvisnosti Flatpak"
 
