@@ -401,3 +401,6 @@ option('plugin-distcc',
        type: 'boolean',
        value: true,
        description: 'Distcc Integration')
+
+option('plugin-trim-trailing-whitespace', type: 'boolean', value: true,
+       description: 'Trim trailing whitespace on changed lines when saving')

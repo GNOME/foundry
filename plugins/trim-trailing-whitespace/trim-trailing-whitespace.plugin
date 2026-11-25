@@ -1,0 +1,6 @@
+[Plugin]
+Name=Trim Trailing Whitespace
+Builtin=true
+Hidden=true
+Embedded=_plugin_trim_trailing_whitespace_register_types
+Module=trim-trailing-whitespace

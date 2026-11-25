@@ -99,6 +99,7 @@ plugins_dict = {
   'ctags': {'options': ['feature-text']},
   'editorconfig': {'options': ['feature-text']},
   'modelines': {'options': ['feature-text']},
+  'trim-trailing-whitespace': {'options': ['feature-text', 'feature-vcs']},
 
   # Template plugins
   'make-templates': {'options': ['feature-templates']},
