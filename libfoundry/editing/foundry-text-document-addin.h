@@ -36,16 +36,16 @@ struct _FoundryTextDocumentAddinClass
 
   DexFuture *(*load)              (FoundryTextDocumentAddin *self);
   DexFuture *(*unload)            (FoundryTextDocumentAddin *self);
-
   DexFuture *(*pre_load)          (FoundryTextDocumentAddin *self);
   DexFuture *(*post_load)         (FoundryTextDocumentAddin *self);
   DexFuture *(*pre_save)          (FoundryTextDocumentAddin *self);
   DexFuture *(*post_save)         (FoundryTextDocumentAddin *self);
-
   DexFuture *(*list_code_actions) (FoundryTextDocumentAddin *self);
+  DexFuture *(*pre_save_as)       (FoundryTextDocumentAddin *self,
+                                   GFile                    *file);
 
   /*< private >*/
-  gpointer _reserved[9];
+  gpointer _reserved[8];
 };
 
 FOUNDRY_AVAILABLE_IN_ALL
@@ -64,5 +64,8 @@ FOUNDRY_AVAILABLE_IN_ALL
 DexFuture           *foundry_text_document_addin_post_load         (FoundryTextDocumentAddin *self) G_GNUC_WARN_UNUSED_RESULT;
 FOUNDRY_AVAILABLE_IN_ALL
 DexFuture           *foundry_text_document_addin_list_code_actions (FoundryTextDocumentAddin *self) G_GNUC_WARN_UNUSED_RESULT;
+FOUNDRY_AVAILABLE_IN_1_3
+DexFuture           *foundry_text_document_addin_pre_save_as       (FoundryTextDocumentAddin *self,
+                                                                    GFile                    *file) G_GNUC_WARN_UNUSED_RESULT;
 
 G_END_DECLS

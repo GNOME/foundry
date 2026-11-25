@@ -281,3 +281,27 @@ foundry_text_document_addin_list_code_actions (FoundryTextDocumentAddin *self)
 
   return foundry_future_new_not_supported ();
 }
+
+/**
+ * foundry_text_document_addin_pre_save_as:
+ * @self: a [class@Foundry.TextDocumentAddin]
+ * @file: the destination file
+ *
+ * Prepares the document for saving to @file. Falls back to the pre_save
+ * implementation for addins without a target-aware hook.
+ *
+ * Returns: (transfer full): a future that resolves on success or rejects on error
+ * Since: 1.3
+ */
+DexFuture *
+foundry_text_document_addin_pre_save_as (FoundryTextDocumentAddin *self,
+                                         GFile                    *file)
+{
+  dex_return_error_if_fail (FOUNDRY_IS_TEXT_DOCUMENT_ADDIN (self));
+  dex_return_error_if_fail (G_IS_FILE (file));
+
+  if (FOUNDRY_TEXT_DOCUMENT_ADDIN_GET_CLASS (self)->pre_save_as)
+    return FOUNDRY_TEXT_DOCUMENT_ADDIN_GET_CLASS (self)->pre_save_as (self, file);
+
+  return foundry_text_document_addin_pre_save (self);
+}

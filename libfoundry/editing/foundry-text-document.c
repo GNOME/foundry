@@ -1001,7 +1001,6 @@ foundry_text_document_save_as_fiber (gpointer data)
   Save *state = data;
   g_autoptr(FoundryTextBufferProvider) text_buffer_provider = NULL;
   g_autoptr(FoundryTextManager) text_manager = NULL;
-  g_autoptr(GPtrArray) pre = NULL;
   g_autoptr(GPtrArray) post = NULL;
   g_autoptr(GError) error = NULL;
 
@@ -1017,15 +1016,13 @@ foundry_text_document_save_as_fiber (gpointer data)
   text_buffer_provider = _foundry_text_manager_dup_provider (text_manager);
 
   /* Pre save phase */
-  pre = g_ptr_array_new_with_free_func (dex_unref);
-  for (guint i = 0; i < g_list_model_get_n_items (state->addins); i++)
+  for (guint i = 0; state->addins != NULL && i < g_list_model_get_n_items (state->addins); i++)
     {
       g_autoptr(FoundryTextDocumentAddin) addin = g_list_model_get_item (state->addins, i);
-      g_ptr_array_add (pre, foundry_text_document_addin_pre_save (addin));
-    }
 
-  if (pre->len > 0)
-    dex_await (foundry_future_all (pre), NULL);
+      if (!dex_await (foundry_text_document_addin_pre_save_as (addin, state->file), &error))
+        return dex_future_new_for_error (g_steal_pointer (&error));
+    }
 
   /* Actual save operation */
   if (!dex_await (foundry_text_buffer_provider_save (text_buffer_provider,
@@ -1039,7 +1036,7 @@ foundry_text_document_save_as_fiber (gpointer data)
 
   /* Post save phase */
   post = g_ptr_array_new_with_free_func (dex_unref);
-  for (guint i = 0; i < g_list_model_get_n_items (state->addins); i++)
+  for (guint i = 0; state->addins != NULL && i < g_list_model_get_n_items (state->addins); i++)
     {
       g_autoptr(FoundryTextDocumentAddin) addin = g_list_model_get_item (state->addins, i);
       g_ptr_array_add (post, foundry_text_document_addin_post_save (addin));
