@@ -113,7 +113,13 @@ plugin_flatpak_download_stage_build (FoundryBuildStage    *build_stage,
   context = foundry_contextual_dup_context (FOUNDRY_CONTEXTUAL (self));
 
   if (!foundry_context_network_allowed (context))
-    return dex_future_new_true ();
+    {
+      foundry_build_progress_print (progress,
+                                    "%s\n%s\n",
+                                    _("Skipping Flatpak source downloads on a metered connection."),
+                                    "> foundry settings set network allow-when-metered true");
+      return dex_future_new_true ();
+    }
 
   return dex_scheduler_spawn (NULL, 0,
                               plugin_flatpak_download_stage_build_fiber,
